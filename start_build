@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# Copyright (C) 2020, Mike Moss <msm255243@gmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Needs user (not root).
+if [ $UID -eq 0 ]; then
+    echo "Do not run as root..."; exit 1
+fi
+
+# Needs Chromium OS build ENVIRONMENT for chroot.
+if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
+    echo "Needs ENVIRONMENT..."; exit 1
+fi
+
+# Check board name.
+if ! check_board "$@"; then
+    echo "Checking board failed..."; exit 1
+fi
+
+# Check build image type.
+case ${IMAGE} in
+    test) :;;
+    dev) :;;
+    base) :;;
+    *) echo "Failed to determine build image..."; exit 1;;
+esac
+
+# Check verified boot status.
+if [ "$VERITY" == "off" ]; then
+    __verity__="--noenable_rootfs_verification"
+fi
+
+# (You should be in the ~/trunk/src/scripts directory).
+if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
+    cd ~/trunk/src/scripts
+fi
+
+# Start building for a given board (inside your chroot).
+# This command sets up the board target with a default sysroot of /build/${BOARD}.
+# The command downloads a small amount of stuff and takes a few minutes to complete.
+setup_board --board=${BOARD}
+
+# Set the chronos user password.
+# On a Chromium OS computer, you can get command line access (and root access through the sudo command)
+# by logging in with the shared user account "chronos". You should set a password for the chronos user
+# by entering the command below from inside the ~/trunk/src/scripts directory.
+# You will be prompted for a password, which will be stored in encrypted form in /etc/shared_user_passwd.txt.
+./set_shared_user_password.sh
+
+# Build all packages for your board.
+# This step is the rough equivalent of make all in a standard Makefile system. This command handles incremental
+# builds; you should run it whenever you change something and need to rebuild it (or after you run repo sync).
+# Normally, the build_packages command builds the stable version of a package (i.e. from committed git sources),
+# unless you are working on a package (with cros_workon). If you are working on a package, build_packages will
+# build using your local sources.
+./build_packages --board=${BOARD}
+
+# Build a disk image for your board.
+# Once the build_packages step is finished, you can build a Chromium OS-base developer image by running
+# the command below from inside the ~/trunk/src/scripts directory.
+#
+# The args for build_image specify what type of build you want.
+# A test image (in the example above) has additional test-specific packages and also accepts incoming ssh connections.
+# It is more convenient to use test images, but developers could also build developer images. A developer image provides
+# a Chromium OS-based image with additional developer packages. To build it use dev instead of test. If building a test
+# image, the password set using set_shared_user_password.sh will be ignored and "test0000" will be the password instead.
+#
+# The --noenable_rootfs_verification turns off verified boot allowing you to freely modify the root file system. The
+# system is less secure using this flag, however, for rapid development you may want to set this flag. If you would like
+# a more secure, locked-down version of Chromium OS, then simply remove the --noenable_rootfs_verification flag. Finally,
+# if you want just the pristine Chromium OS-based image (closest to Chrome OS but not quite the same), pass in base rather
+# than test or dev. Use build_image --help for more information.
+#
+# The image produced by build_image will be located in ~/trunk/src/build/images/${BOARD}/versionNum
+# (where versionNum will actually be a version number). The most recent image produced for a given board
+# will be symlinked to ~/trunk/src/build/images/${BOARD}/latest.
+./build_image --board=${BOARD} ${__verity__} ${IMAGE}
+
+exit $?

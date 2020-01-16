@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Needs usb.
+if [ $# -eq 1 ] && [ -b $1 ]; then
+    # Flash your image on a usb stick.
+    cros flash usb://${1} ~/trunk/src/build/images/${BOARD}/latest
+else
+    echo "Need a valid usb device..."
+    exit 1
+fi

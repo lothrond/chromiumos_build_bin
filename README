@@ -1,0 +1,108 @@
+========================
+  chromiumos_build_bin
+========================
+
+Chromium OS build helper scripts.
+
+--------------
+ Requirements 
+--------------
+
+ o RAM: 8-16GB
+ o Disk Space: 135-250GB
+ o Network: (decent speed)
+ o (google account)
+
+-------
+ Setup
+-------
+
+  00. Start by cloning this repository into ~/scripts:
+        $ git clone https://github.com/lothrond/chromiumos-build-bin: ~/bin
+
+  01. Source build ENVIRONMENT for host:
+        $ source ~/bin/environment/host.sh
+
+  02. Install git and curl (and lvm tools):
+        $ install_git_and_curl
+
+  03. Configure git:
+        $ configure_git
+
+  04. Tweak the sudoers config file:
+        $ tweak_sudoers_config
+
+  05. Install depot_tools:
+        $ install_depot_tools
+
+  06. Setup gerrit code review, (see README-GERRIT).
+
+  07. Get the source code:
+        $ get_source_code
+
+  08. Add google API keys, (see README-APIKEYS).
+
+  09. Setup authorization for google storage buckets, (see README-GSBUCKETS).
+
+-------
+ Build
+-------
+
+  00. Make sure you have ~/.googleapikeys populated correctly! (see README-APIKEYS).
+
+  01. Share ~/bin with the chroot, (see README-SHARING):
+       $ touch chromiumos/src/bin/.local_mounts
+       $ echo "/home/$(whoami)/bin" > chromiumos/src/scripts/.local_mounts
+
+      (The rest of this build assumes a shared folder in the chroot named ~/bin).
+
+  02. Create chroot:
+        $ cros_sdk
+
+  03. Select your board (see README-BOARDS):
+        (cr) $ export BOARD=cyan
+
+      Select your disk image build (test/dev/base):
+        (cr) $ export IMAGE=test
+
+      Select verified boot mode (on/off):
+        (cr) $ export VERITY=off
+
+     OR
+
+      Source build ENVIRONMENT for chroot:
+        (cr) source ~/bin/environment/chroot.sh
+
+      ** This repository defaults to building test images, without verified boot, for cyan boards.
+
+      ** If you would like to build for another board, you will need to modify environment/chroot.sh 
+         before running build_image.
+
+  4. Build chromiumos:
+       (cr) $ start_build
+
+------
+ Test
+------
+
+  0. Mount:
+       (cr) $ mount_disk_image
+
+  1. (Test)
+
+  2. Unmount:
+       (cr) $ unmount_disk_image
+
+---------
+ Install
+---------
+
+ 00. Flash Chromium OS on to a usb stick.
+       (cr) $ flash_image_usb
+
+     **WARNING: this will of course format the usb stick**
+
+ 01. Make sure the Chrome OS device is in developer mode (see README-DEVMODE).
+
+ 02. (boot)
+

@@ -1,0 +1,7 @@
+##
+## Make sure you are authorized to access Google Storage (GS) buckets.
+##
+
+ go to:
+   https://chromium.googlesource.com/chromiumos/docs/+/master/gsutil.md
+

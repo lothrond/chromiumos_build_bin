@@ -1,0 +1,10 @@
+##
+## Enable developer mode on Chrome OS devices.
+##
+
+ go to:
+   https://chromium.googlesource.com/chromiumos/docs/+/master/developer_mode.md
+
+ and:
+   https://chromium.googlesource.com/chromiumos/docs/+/master/debug_buttons.md#firmware-keyboard-interface
+

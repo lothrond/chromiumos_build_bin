@@ -1,0 +1,7 @@
+#!/bin/bash
+install_git_and_curl
+configure_git "$@"
+tweak_sudoers_config
+install_depot_tools
+get_source_code
+exit $?

@@ -1,0 +1,141 @@
+#!/bin/bash
+
+# Needs board.
+if [ $# -eq 1 ]; then
+    BOARD="$1"
+elif [ $BOARD ]; then
+    :
+else
+    echo "USAGE: $(basename $0) [BOARD]"
+    exit 1
+fi
+
+## Google ChromeOS board database
+CHROMIUMOS_BOARDS=()
+CHROMIUMOS_BOARDS+=amd64-generic
+CHROMIUMOS_BOARDS+=arm-gneric
+CHROMIUMOS_BOARDS+=arm64-generic
+CHROMIUMOS_BOARDS+=cyan
+CHROMIUMOS_BOARDS+=octopus
+CHROMIUMOS_BOARDS+=scarlet
+CHROMIUMOS_BOARDS+=grunt
+CHROMIUMOS_BOARDS+=rammus
+CHROMIUMOS_BOARDS+=liara
+CHROMIUMOS_BOARDS+=Octopus
+CHROMIUMOS_BOARDS+=hana
+CHROMIUMOS_BOARDS+=bobba360
+CHROMIUMOS_BOARDS+=bobba
+CHROMIUMOS_BOARDS+=coral
+CHROMIUMOS_BOARDS+=nocturne
+CHROMIUMOS_BOARDS+=nautilus
+CHROMIUMOS_BOARDS+=nami
+CHROMIUMOS_BOARDS+=pantheon
+CHROMIUMOS_BOARDS+=vayne
+CHROMIUMOS_BOARDS+=fizz
+CHROMIUMOS_BOARDS+=soraka
+CHROMIUMOS_BOARDS+=eve
+CHROMIUMOS_BOARDS+=sand
+CHROMIUMOS_BOARDS+=Bob
+CHROMIUMOS_BOARDS+=reef
+CHROMIUMOS_BOARDS+=caroline
+CHROMIUMOS_BOARDS+=snappy
+CHROMIUMOS_BOARDS+=pyro
+CHROMIUMOS_BOARDS+=veyron_feivel
+CHROMIUMOS_BOARDS+=veyron_tiger
+CHROMIUMOS_BOARDS+=kevin
+CHROMIUMOS_BOARDS+=asuka
+CHROMIUMOS_BOARDS+=kefka
+CHROMIUMOS_BOARDS+=cave
+CHROMIUMOS_BOARDS+=elm
+CHROMIUMOS_BOARDS+=bannon
+CHROMIUMOS_BOARDS+=wizpig
+CHROMIUMOS_BOARDS+=relm
+CHROMIUMOS_BOARDS+=reks
+CHROMIUMOS_BOARDS+=setzer
+CHROMIUMOS_BOARDS+=lars
+CHROMIUMOS_BOARDS+=sentry
+CHROMIUMOS_BOARDS+=chell
+CHROMIUMOS_BOARDS+=buddy
+CHROMIUMOS_BOARDS+=edgar
+CHROMIUMOS_BOARDS+=ultima
+CHROMIUMOS_BOARDS+=terra
+CHROMIUMOS_BOARDS+=celes
+CHROMIUMOS_BOARDS+=heli
+CHROMIUMOS_BOARDS+=veyron_mickey
+CHROMIUMOS_BOARDS+=gandof
+CHROMIUMOS_BOARDS+=orco
+CHROMIUMOS_BOARDS+=sumo
+CHROMIUMOS_BOARDS+=ninja
+CHROMIUMOS_BOARDS+=lulu
+CHROMIUMOS_BOARDS+=guado
+CHROMIUMOS_BOARDS+=nyan_kitty
+CHROMIUMOS_BOARDS+=veyron_minnie
+CHROMIUMOS_BOARDS+=tidus
+CHROMIUMOS_BOARDS+=rikku
+CHROMIUMOS_BOARDS+=veyron_speedy
+CHROMIUMOS_BOARDS+=veyron_jerry
+CHROMIUMOS_BOARDS+=veyron_yuna
+CHROMIUMOS_BOARDS+=veyron_mighty
+CHROMIUMOS_BOARDS+=veyron_jaq
+CHROMIUMOS_BOARDS+=banjo
+CHROMIUMOS_BOARDS+=samus
+CHROMIUMOS_BOARDS+=candy
+CHROMIUMOS_BOARDS+=auron_paine
+CHROMIUMOS_BOARDS+=nyan_blaze
+CHROMIUMOS_BOARDS+=winky
+CHROMIUMOS_BOARDS+=tricky
+CHROMIUMOS_BOARDS+=nyan_big
+CHROMIUMOS_BOARDS+=swanky
+CHROMIUMOS_BOARDS+=kip
+CHROMIUMOS_BOARDS+=gnawty
+CHROMIUMOS_BOARDS+=qwuaks
+CHROMIUMOS_BOARDS+=mccloud
+CHROMIUMOS_BOARDS+=zako
+CHROMIUMOS_BOARDS+=expresso
+CHROMIUMOS_BOARDS+=enguarde
+CHROMIUMOS_BOARDS+=glimmer
+CHROMIUMOS_BOARDS+=squawks
+CHROMIUMOS_BOARDS+=clapper
+CHROMIUMOS_BOARDS+=daisy_skate
+CHROMIUMOS_BOARDS+=monroe
+CHROMIUMOS_BOARDS+=peach_pi
+CHROMIUMOS_BOARDS+=peach_pit
+CHROMIUMOS_BOARDS+=panther
+CHROMIUMOS_BOARDS+=leon
+CHROMIUMOS_BOARDS+=wolf
+CHROMIUMOS_BOARDS+=daisy_spring
+CHROMIUMOS_BOARDS+='falco & falco_li'
+CHROMIUMOS_BOARDS+=peppy
+CHROMIUMOS_BOARDS+=butterfly
+CHROMIUMOS_BOARDS+=link
+CHROMIUMOS_BOARDS+=stout
+CHROMIUMOS_BOARDS+=parrot
+CHROMIUMOS_BOARDS+=parrot_ivb
+CHROMIUMOS_BOARDS+=daisy
+CHROMIUMOS_BOARDS+=stumpy
+CHROMIUMOS_BOARDS+=lumpy
+CHROMIUMOS_BOARDS+='x86-zgb & x86-zgb_he'
+CHROMIUMOS_BOARDS+='x86-alex & x86-alex_he'
+CHROMIUMOS_BOARDS+=x86-mario
+# googlers
+CHROMIUMOS_GOOGLE_BOARD=betty
+
+# Check board
+if ! echo ${CHROMIUMOS_BOARDS} | grep -q ${BOARD}; then
+    echo "I am not prepared to build for board: ${BOARD}"
+    echo
+    echo "(Is this correct? feel free to make changes!)"
+    echo
+    echo "see also:"
+    echo "  https://sites.google.com/a/chromium.org/dev/chromium-os/developer-information-for-chrome-os-devices"
+    echo
+    exit 1
+
+elif [ "$BOARD" == "$CHROMIUMOS_GOOGLE_BOARD" ]; then
+    echo "You are not a googler..."
+    exit 1
+else
+    echo "Board supported!"
+fi
+
+exit $?
