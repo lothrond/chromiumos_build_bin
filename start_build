@@ -44,7 +44,6 @@ if [ "$VERITY" == "off" ]; then
 fi
 
 # colors
-colr="\e[31m"
 colg="\e[32m"
 res="\e[0m"
 
@@ -54,13 +53,6 @@ echo -e "${colg}*${res} BOARD:  ${BOARD}"
 echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
 echo -e "${colg}*${res} VERITY: ${VERITY}"
 echo
-
-# Last chance...
-echo -e -n "Continue? ${colr}[y/N]:${res} "
-while read a; do case "$a" in
-    y|Y|yes|Yes|YES) echo; break;;
-    *) echo -e "\nexiting..."; exit 1; break;;
-esac done
 
 # (You should be in the ~/trunk/src/scripts directory).
 if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
