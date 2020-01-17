@@ -6,6 +6,7 @@ export PATH=~/bin:${PATH}
 
 # board name
 export BOARD=cyan
+#export BOARD_VARIANT=
 
 # build image
 export IMAGE=test

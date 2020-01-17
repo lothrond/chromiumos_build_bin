@@ -30,6 +30,11 @@ if ! check_board "${BOARD}"; then
     echo "Checking board failed..."; exit 1
 fi
 
+# Check board variant
+if [ $BOARD_VARIANT ]; then
+    export BOARD="${BOARD}_${BOARD_VARIANT}"
+fi
+
 # Check build image type.
 case ${IMAGE} in
     test) :;;
