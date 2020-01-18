@@ -13,9 +13,9 @@ Chromium OS build helper scripts.
  o Network: (decent speed)
  o (google account)
 
--------
- Setup
--------
+--------------
+ Manual Setup
+--------------
 
   00. Start by cloning this repository into ~/scripts:
         $ git clone https://github.com/lothrond/chromiumos-build-bin: ~/bin
@@ -44,9 +44,9 @@ Chromium OS build helper scripts.
 
   09. Setup authorization for google storage buckets, (see README-GSBUCKETS).
 
--------
- Build
--------
+--------------
+ Manual Build
+--------------
 
   00. Make sure you have ~/.googleapikeys populated correctly! (see README-APIKEYS).
 
@@ -104,5 +104,5 @@ Chromium OS build helper scripts.
 
  01. Make sure the Chrome OS device is in developer mode (see README-DEVMODE).
 
- 02. (boot)
+ 02. 
 
