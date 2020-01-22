@@ -1,0 +1,49 @@
+#!/bin/bash
+
+## BEGIN DEFAULT CHROMIUM HOST BUILD ENVIRONMENT:
+
+[ $CHROMIUM_DIR ] || \
+    CHROMIUM_DIR=~/chromium
+
+## END DEFAULT CHROMIUM HOST BUILD ENVIRONMENT.
+
+set -o errexit
+
+# Chromium directory is needed for the checkout.
+if [ ! -d $CHROMIUM_DIR ]; then
+    mkdir -p $CHROMIUM_DIR
+fi
+
+# change to it.
+if [ "$(pwd)" != "$CHROMIUM_DIR" ]; then
+    cd $CHROMIUM_DIR
+fi
+
+# If you don't want the full repo history, you can save a lot of time by adding the --no-history flag to fetch.
+# Expect the command to take 30 minutes on even a fast connection, and many hours on slower ones.
+#
+# If you've already installed the build dependencies on the machine (from another checkout, for example),
+# you can omit the --nohooks flag and fetch will automatically execute gclient runhooks at the end.
+#
+# When fetch completes,
+# it will have created a hidden .gclient file and a directory called src in the working directory.
+fetch --nohooks android
+
+# The remaining instructions assume you have switched to the src directory:
+cd src
+
+# Once you have checked out the code, run the following to get all of the dependencies you need to build on Linux,
+# plus all of the Android-specific dependencies (you need some of the regular Linux dependencies because an Android
+# build includes a bunch of the Linux tools and utilities).
+build/install-build-deps-android.sh
+
+# You can now run the Chromium-specific hooks, which will download additional binaries and other things you might need
+gclient runhooks
+
+# Google API keys.
+#...
+# ~/.googleapikeys ?
+#...
+
+
+exit $?

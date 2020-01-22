@@ -1,10 +1,28 @@
 #!/bin/bash
 
-# Needs usb.
-if [ $# -eq 1 ] && [ -b $1 ]; then
-    # Flash your image on a usb stick.
-    cros flash usb://${1} ~/trunk/src/build/images/${BOARD}/latest
+# Flash your image on a usb stick.
+flash_image_usb() {
+    cros flash usb://${2} ~/trunk/src/build/images/${BOARD}/latest/chromiumos_${1}_image.bin
+}
+
+if [ $# -eq 2 ] && [ -b $2 ]; then
+    case "$2" in
+        base) :;;
+        dev) :;;
+        test) :;;
+        *) exit 1;;
+    esac
+    flash_image_usb
 else
-    echo "Need a valid usb device..."
+    echo "$(basename $0) - flash Chromium OS image on a usb stick"
+    echo
+    echo "USAGE: $(basename $0) [IMAGE] DEVICE"
+    echo
+    echo "IMAGES:"
+    echo "   [base] [dev] [test]"
+    echo
+    echo "EXAMPLE:"
+    echo "   $(basename $0) base /dev/sdc"
+    echo
     exit 1
 fi
