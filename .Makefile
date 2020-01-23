@@ -21,5 +21,10 @@ VERITY ?= on
 
 ## END CHROMIUM OS ENVIRONMENT.
 
-chromiumos: $(DEPOT_TOOLS) $(SOURCE_REPO)
-	./chromiumos-autobuild
+os: $(DEPOT_TOOLS) $(SOURCE_REPO)
+
+os-sync: $(SOURCE_REPO) $(DEPOT_TOOLS)
+    cd $(SOURCE_REPO)
+	repo sync $(REPOSYNC)
+
+

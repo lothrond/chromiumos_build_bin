@@ -87,13 +87,15 @@ PROG=$(basename $0)
 DESC='automatic builds for Chromium OS'
 uopts="abhpif"
 gopts="all,board,help,packages,image,flash"
-opts=$(getopts -o $uopts -l $gopts -n "$PROG" -- "$@")
+opts=$(getopt -o $uopts -l $gopts -n "$PROG" -- "$@")
 [ $? -eq 0 ] || { exit 1 ;}
 
 if [ $# -eq 0 ]; then
     show_usage
     exit 1
 fi
+
+eval set -- "$opts"
 
 while true; do case "$1" in
     -a|--all)

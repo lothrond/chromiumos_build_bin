@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Needs to be in Chromium OS source dir.
+if [ "$(pwd)" != "${SOURCE_REPO}" ]; then
+    cd ${SOURCE_REPO}
+fi
+
+# Sync repositories using REPOSYNC flag.
+repo sync ${REPOSYNC}

@@ -1,12 +1,5 @@
 #!/bin/bash
 
-## BEGIN DEFAULT CHROMIUM HOST BUILD ENVIRONMENT:
-
-[ $CHROMIUM_DIR ] || \
-    CHROMIUM_DIR=~/chromium
-
-## END DEFAULT CHROMIUM HOST BUILD ENVIRONMENT.
-
 set -o errexit
 
 # Chromium directory is needed for the checkout.
@@ -44,6 +37,5 @@ gclient runhooks
 #...
 # ~/.googleapikeys ?
 #...
-
 
 exit $?

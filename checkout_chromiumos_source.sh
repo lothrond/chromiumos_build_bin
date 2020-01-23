@@ -27,6 +27,6 @@ repo init -u https://chromium.googlesource.com/chromiumos/manifest.git \
 # repo can concurrently sync multiple repositories at once. You can adjust the number based on how fast your
 # internet connection is. For the initial sync, it's generally requested that you use no more than 8 concurrent jobs.
 # (For later syncs, when you already have the majority of the source local, using -j16 or so is generally okay.)
-repo sync $REPOFLAGS
+repo sync $REPOSYNC
 
 exit $?
