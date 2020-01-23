@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Can use [-new] [-force] options.
+[ $BUILDER ] || BUILDER=""
+
+set -o errexit
+
+# Needs to be in source repo.
+if [ "$(pwd)" != "${SOURCE_REPO}" ]; then
+    cd ${SOURCE_REPO}
+fi
+
+# Enter chroot and autobuild.
+cros_sdk -- `source ~/bin/environment/chroot.sh && crosbuild ${BUILDER}`
+
+exit $?
