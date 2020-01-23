@@ -17,16 +17,14 @@ Chromium OS build helper scripts.
  Manual Setup
 --------------
 
-  00. Start by cloning this repository:
-        $ git clone https://github.com/lothrond/chromium-ws
+  00. Start by cloning this repository into ~/bin:
+        $ git clone https://github.com/lothrond/chromiumos-build-bin ~/bin
 
   01. Change into it:
-        $ cd chromium-ws
-
-      (Make sure you are in this directory)
+        $ cd ~/bin
 
   02. Source build ENVIRONMENT for host:
-        $ source environment.sh
+        $ source environment/host.sh
 
   03. Install git and curl (and lvm tools):
         $ ./install_git_and_curl.sh
@@ -43,7 +41,7 @@ Chromium OS build helper scripts.
   07. Setup gerrit code review, (see docs/README-GERRIT).
 
   08. Get the source code:
-        $ ./checkout_chromiumos.sh
+        $ ./source_checkout.sh
 
   09. Add google API keys, (see docs/README-APIKEYS).
 

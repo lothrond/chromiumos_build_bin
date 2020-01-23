@@ -8,9 +8,9 @@ export PATH=~/bin:${PATH}
 export BOARD=cyan
 
 # build image
-export IMAGE=test
+export IMAGE=base
 
 # verified boot
-export VERITY=off
+export VERITY=on
 
 ## END CHROMIUM OS BUILD CHROOT ENVIRONMENT

@@ -14,50 +14,106 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+## START ENVIRONMENT:
 
-# Needs user (not root).
-if [ $UID -eq 0 ]; then
-    echo "Do not run as root..."; exit 1
+:
+
+## END ENVIRONMENT.
+
+# Needs to be in source repository.
+if [ ! -d ${SOURCE_REPO} ]; then
+    cd ${SOURCE_REPO}
 fi
 
-# Needs Chromium OS build ENVIRONMENT for chroot.
-if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
-    echo "Needs ENVIRONMENT..."; exit 1
+# Setup board*
+# Set chronos password*
+# Build packages
+# Build Image
+
+__usage__() {
+    echo "$PROG -- $DESC"
+    echo
+    echo "USAGE: $PROG [OPTIONS]"
+    echo
+    echo "OPTIONS:"
+    echo "   -p,--pass   setup chronos user password"
+    echo "   -s,--set    setup new board"
+    echo "   -f,--force  force new board setup"
+    echo
+}
+
+PROG=$(basename $0)
+DESC='autobuilder for Chromium OS'
+SET_PASS=0
+SET_BOARD=0
+FORCE=0
+uopts="psf"
+gopts="pass,set,force"
+opts=$(getopt -o $uopt -l $gopt -n "$PROG" -- "$@")
+[ $? -eq 0 ] || { exit 1 ;}
+
+if [ $# -eq 0 ]; then
+    :
 fi
 
-# Check board name.
-if ! check_board "${BOARD}"; then
-    echo "Checking board failed..."; exit 1
-fi
+eval set -- "$opts"
 
-# Check build image type.
-case ${IMAGE} in
-    test) :;;
-    dev) :;;
-    base) :;;
-    *) echo "Failed to determine build image..."; exit 1;;
-esac
+while :; do case "$1" in
+    -p|--pass) SET_PASS=1; break;;
+    -s|--set) SET_BOARD=1; break;;
+    -f|--force) FORCE=1; break;;
+    *) :; exit 1; break;;
+esac done
 
-# Check verified boot status.
-if [ "$VERITY" == "off" ]; then
-    __verity__="--noenable_rootfs_verification"
-fi
+prebuild_check() {
+    # Needs user (not root).
+    if [ $UID -eq 0 ]; then
+        echo "Do not run as root..."; exit 1
+    fi
 
-# colors
-colg="\e[32m"
-res="\e[0m"
+    # Needs Chromium OS build ENVIRONMENT for chroot.
+    if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
+        echo "Needs ENVIRONMENT..."; exit 1
+    fi
 
-# Print ENVIRONMENT.
-echo
-echo -e "${colg}*${res} BOARD:  ${BOARD}"
-echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
-echo -e "${colg}*${res} VERITY: ${VERITY}"
-echo
+    # Check board name.
+    if ! check_board "${BOARD}"; then
+        echo "Checking board failed..."; exit 1
+    fi
 
-# (You should be in the ~/trunk/src/scripts directory).
-if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
-    cd ~/trunk/src/scripts
-fi
+    # Check build image type.
+    case ${IMAGE} in
+        test) :;;
+        dev) :;;
+        base) :;;
+        *) echo "Failed to determine build image..."; exit 1;;
+    esac
+
+    # Check verified boot status.
+    if [ "$VERITY" == "off" ]; then
+        __verity__="--noenable_rootfs_verification"
+    fi
+
+    # (You should be in the ~/trunk/src/scripts directory).
+    if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
+        cd ~/trunk/src/scripts
+    fi
+}
+
+build_motd() {
+    # colors
+    colg="\e[32m"
+    res="\e[0m"
+
+    # Print ENVIRONMENT.
+    echo
+    echo -e "${colg}*${res} BOARD:  ${BOARD}"
+    echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
+    echo -e "${colg}*${res} VERITY: ${VERITY}"
+    echo
+}
+
 
 # Start building for a given board (inside your chroot).
 # This command sets up the board target with a default sysroot of /build/${BOARD}.
