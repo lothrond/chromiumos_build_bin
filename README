@@ -26,24 +26,26 @@ Chromium OS build helper scripts.
   02. Source build ENVIRONMENT for host:
         $ source environment/host.sh
 
+      (Consider adding to your .bashrc)
+
   03. Install git and curl (and lvm tools):
-        $ ./install_git_and_curl.sh
+        $ ./setup/install_git_and_curl.sh
 
   04. Configure git:
-        $ ./configure_git.sh
+        $ ./setup/configure_git.sh
 
   05. Tweak the sudoers config file:
-        $ ./tweak_sudoers_config.sh
+        $ ./setup/tweak_sudoers_config.sh
 
   06. Install depot_tools:
-        $ ./install_depot_tools.sh
+        $ ./setup/install_depot_tools.sh
 
   07. Setup gerrit code review, (see docs/README-GERRIT).
 
   08. Get the source code:
-        $ ./source_checkout.sh
+        $ ./setup/source_checkout.sh
 
-  09. Add google API keys, (see docs/README-APIKEYS).
+  09. Setup google API keys, (see docs/README-APIKEYS).
 
   10. Setup authorization for google storage buckets, (see docs/README-GSBUCKETS).
 
@@ -51,12 +53,15 @@ Chromium OS build helper scripts.
  Manual Build
 --------------
 
-  00. Make sure you have ~/.googleapikeys populated correctly! (see docs/README-APIKEYS).
+  00. Make sure you either:
+        a) have ~/.googleapikeys populated correctly
+        b) supply API keys at runtime in /etc/chromoes_config.txt
+        (see docs/README-APIKEYS)
 
   01. Share directories with the chroot, (see docs/README-SHARING):
-        $ ./share_dirs.sh
+        $ ./setup/local_mounts.sh
 
-      (After running this command, you will have ~/builder inside of your chroot.)
+      (After running this command, you should have ~/bin inside of your chroot.)
 
   02. Create chroot:
         $ cd ${SOURCE_REPO} && cros_sdk
@@ -82,18 +87,23 @@ Chromium OS build helper scripts.
 
      OR
 
-      (If you ran share-dirs.sh),
+      Source ENVIRONMENT for chroot:
+        (cr) source ~/bin/chroot.sh
 
-      Source build ENVIRONMENT for chroot:
-        (cr) source ~/build/chroot.sh
+      (This will only work after running ./setup/local_mounts.sh)
 
       ** This repository defaults to building base images, with verified boot, for cyan boards.
 
-      ** If you would like to build for another board, you will need to modify chroot.sh 
+      ** If you would like to build for another board, you will need to modify environment/chroot.sh 
          before buidling the image.
 
-  4. Build chromiumos:
-       (cr) $ . ~/build/build_os
+  4. Build Chromium OS:
+       (cr) $ crosbuild new
+
+  5. Flash Chromium OS on to a usb stick.
+       (cr) $ flash_image_usb
+
+     **WARNING: this will of course format the usb stick**
 
 ------
  Test
@@ -113,12 +123,58 @@ Chromium OS build helper scripts.
  Install
 ---------
 
- 00. Flash Chromium OS on to a usb stick.
-       (cr) $ ./flash_image_usb
+  00. Make sure the Chrome OS device is in developer mode (see docs/README-DEVMODE).
 
-     **WARNING: this will of course format the usb stick**
+---
 
- 01. Make sure the Chrome OS device is in developer mode (see docs/README-DEVMODE).
+ Note: You will still be able to recover Chome OS with recovery media.
 
+  This tutorial assumes you are currently in a normal Chrome OS device.
 
+   o Start by backing up, etc.
+
+   o Then, make sure all external devices, usbs, sd, etc., are all unmounted and removed.
+
+---
+
+  01. Put the device in recovery mode:
+       [esc]+[refresh] + [power]
+
+  02. From recovery mode, put the device in developer mode:
+       [ctrl]+[d]
+
+      **WARNING: This is going to wipe your disk**
+
+      This will format your device, then reboot to recovery.
+      The default timeout is 30 seconds.
+
+  03. Let the recovery timeout, or try pressing: [ctrl]+[d] to boot into developer mode. 
+
+  04. You should now be on the setup screen. From this screen just switch to a tty with:
+       [ctrl]+[alt]+[f2] (the forward button)
+
+  05. You should now be in tty2. Login as chronos (you should not need a password).
+
+  06. To be able to boot from usb media run:
+       sudo crossystem dev_boot_usb=1
+
+  07. Reboot to to recovery.
+
+  08. Plugin usb.
+
+  09. This time, press: [ctrl]+[u] to boot from usb media.
+
+      (Chromium boot splash...)
+
+  10. Repeat step 4.
+
+  11. Login as the shared user chronos, and supply your password.
+
+  12. Install Chromium OS onto device:
+        /usr/sbin/chromeos-install
+
+      (Press y if you agree)
+
+      This will not take very long. 
+      After this is done, i believe the rest should be self explainitory...
 

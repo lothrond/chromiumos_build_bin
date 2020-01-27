@@ -15,12 +15,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Needs to be in chroot.
+
 # Needs user (not root).
 if [ $UID -eq 0 ]; then
     echo "Do not run as root..."; exit 1
 fi
 
-# Needs Chromium OS build ENVIRONMENT for chroot.
+# Needs environment for chroot:
+source ~/bin/environment/chroot.sh
+
+# Check ENVIRONMENT for chroot:
 if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
     echo "Needs ENVIRONMENT..."; exit 1
 fi
@@ -59,21 +64,22 @@ if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
     cd ~/trunk/src/scripts
 fi
 
-# Setup new build/board and password (only needed once).
+# Setup new board and shared user password (only needed once).
+# NOTE: you are able to run ./set_shared_user_password.sh
+# manually to set/change the shared user password.
 if [ $# -eq 1 ]; then
-    if [ "$1" == "-new" ] || [ "$1" == "-force" ]; then
-        if [ "$1" == "-force" ]; then
+    if [ "$1" == "new" ] || [ "$1" == "force" ]; then
+        if [ "$1" == "force" ]; then
             flag="--force"
         fi
+        ./setup_board --board=${BOARD} "$flag"
+        ./set_shared_user_password.sh
+    else
+        echo "USAGE: $(basename $0) [new] [force]"
     fi
-    ./setup_board --board=${BOARD} "$@"
-    ./set_shared_user_password.sh
-else
-    echo "USAGE: $(basenmae $0) [-new] [-force]"
 fi
 
-# Build packages and disk image.
+# Build all packages and disk image.
 ./build_packages --board=${BOARD}
 ./build_image --board=${BOARD} ${__verity__} ${IMAGE}
 
-exit $?

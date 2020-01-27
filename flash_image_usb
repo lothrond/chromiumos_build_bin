@@ -1,28 +1,63 @@
 #!/bin/bash
 
-# Flash your image on a usb stick.
-flash_image_usb() {
-    cros flash usb://${2} ~/trunk/src/build/images/${BOARD}/latest/chromiumos_${1}_image.bin
-}
 
-if [ $# -eq 2 ] && [ -b $2 ]; then
-    case "$2" in
-        base) :;;
-        dev) :;;
-        test) :;;
-        *) exit 1;;
-    esac
-    flash_image_usb
-else
-    echo "$(basename $0) - flash Chromium OS image on a usb stick"
+# colors
+colr="\e[31m"
+colg="\e[32m"
+res="\e[0m"
+
+__head__() { echo "$(basename $0) - flash Chromium OS image on a usb stick" ;}
+
+if [ $# -eq 1 ] && [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    __head__
     echo
-    echo "USAGE: $(basename $0) [IMAGE] DEVICE"
+    echo "Example:"
+    echo "   Enter a usb device: /dev/sdc"
+    echo "   Enter a disk image: latest/base"
     echo
-    echo "IMAGES:"
-    echo "   [base] [dev] [test]"
+    echo "This will run:"
+    echo "  cros flash usb:///dev/sdc ~/trunk/build/images/\${BOARD}/latest/chromiumos_base_image.bin"
     echo
-    echo "EXAMPLE:"
-    echo "   $(basename $0) base /dev/sdc"
-    echo
-    exit 1
+    exit 0
 fi
+
+# Print informational header.
+__head__
+echo -e "\n(Run with ${colg}-h${res} or ${colg}--help${res} for more information)"
+echo -e "(Press ${colg}ctrl+c${res} to quit anytime)\n"
+
+# Get a valid usb device, or be yelled at.
+getdev() { echo -e -n "${colg}Enter usb device:${res} " ;}
+getdevfailed() { echo -e "${colr}Not a valid usb device${res}" ;}
+while getdev; read usbdev; do 
+    if [ ! -b $usbdev ]; then
+        getdevfailed
+    else
+        break
+    fi
+done
+
+# disk images
+imagedir=~/trunk/src/build/images/${BOARD}
+
+# Get valid image.
+getimg() { echo -e -n "${colg}Enter disk image:${res}" ;}
+getimgfailed() { echo -e "${colr}No valid disk image found in: ${diskimage}${res}" ;}
+valid_dir="ls $imagedir | grep $(echo ${diskimage} | cut -d '/' -f 1) >& /dev/null"
+valid_bin="ls $imagedir | grep $(echo ${diskimage} | cut -d '/' -f 2) >& /dev/null"
+while getimg; read diskimage; do
+    if $valid_dir && $valid_bin; then
+        diskimage="${imagedir}/$(${diskimage} | cut -d '/' -f 1)/chromiumos_$($diskimage | cut -d '/' -f 2).bin"
+        break
+    else
+        getimgfailed
+    fi
+done
+
+# Flash image to usb.
+#echo -e "\nFlashing to usb device: ${colg}${usbdev}${res}"
+#cros flash usb://${usbdev} ${diskimage}
+
+
+# testing
+echo -e "$usbdev $diskimage"

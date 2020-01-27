@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# Can use [-new] [-force] options.
-[ $BUILDER ] || BUILDER=""
+# Can use:
+#  export BUILD=new or export BUILD=force
+# Before running, for new builds. 
+# Or, you can set the crosbuild option here.
+[ $BUILD ] || BUILD=""
 
 set -o errexit
+
+# Needs environment.
+# source ~/build/environment/host.sh
 
 # Needs to be in source repo.
 if [ "$(pwd)" != "${SOURCE_REPO}" ]; then
@@ -11,6 +17,6 @@ if [ "$(pwd)" != "${SOURCE_REPO}" ]; then
 fi
 
 # Enter chroot and autobuild.
-cros_sdk -- `source ~/bin/environment/chroot.sh && crosbuild ${BUILDER}`
+cros_sdk -- ~/build/crosbuild ${BUILD}
 
 exit $?

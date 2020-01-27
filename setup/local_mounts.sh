@@ -19,5 +19,5 @@ fi
 # the second will be the path INSIDE the chroot.  The source directory must exist; otherwise, cros_sdk
 # will give off an ugly python error and fail to enter the chroot.
 # (Note: For security and safety reasons, all directories mounted via .local_mounts will be read-only.)
-echo "/home/$(whoami)/chromium-build-bin bin" > ${CHROMIUM_CHROOT_SHARE_FILE}
+echo "/home/$(whoami)/bin" > ${CHROMIUM_CHROOT_SHARE_FILE}
 
