@@ -1,17 +1,14 @@
 #!/bin/bash
 
-## BEGIN CHROMIUM OS BUILD CHROOT ENVIRONMENT
+## BEGIN CHROMIUM OS BUILD CHROOT ENVIRONMENT:
 
 export PATH=~/bin:${PATH}
-
-# board name
 export BOARD=cyan
+<<<<<<< HEAD
 #export BOARD_VARIANT=
+=======
+export IMAGE=base
+export VERITY=on
+>>>>>>> dev
 
-# build image
-export IMAGE=test
-
-# verified boot
-export VERITY=off
-
-## END CHROMIUM OS BUILD CHROOT ENVIRONMENT
+## END CHROMIUM OS BUILD CHROOT ENVIRONMENT.
