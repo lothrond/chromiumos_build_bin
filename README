@@ -100,7 +100,7 @@ Chromium OS build helper scripts.
        (cr) $ crosbuild new
 
   5. Flash Chromium OS on to a usb stick.
-       (cr) $ flash_image_usb
+       (cr) $ usb_flash
 
      **WARNING: this will of course format the usb stick**
 
