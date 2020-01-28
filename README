@@ -1,5 +1,5 @@
 ========================
-  chromiumos_build_bin
+chromiumos_build_bin
 ========================
 
 Chromium OS build helper scripts.
@@ -18,13 +18,13 @@ Chromium OS build helper scripts.
 --------------
 
   00. Start by cloning this repository into ~/bin:
-        $ git clone https://github.com/lothrond/chromiumos-build-bin ~/bin
+        $ git clone https://github.com/lothrond/chromiumos_build_bin ~/bin
 
   01. Change into it:
         $ cd ~/bin
 
   02. Source build ENVIRONMENT for host:
-        $ source environment/host.sh
+        $ source ./environment/host.sh
 
       (Consider adding to your .bashrc)
 
@@ -55,8 +55,7 @@ Chromium OS build helper scripts.
 
   00. Make sure you either:
         a) have ~/.googleapikeys populated correctly
-        b) supply API keys at runtime in /etc/chromoes_config.txt
-        (see docs/README-APIKEYS)
+        b) supply API keys at runtime in /etc/chrome_dev.conf
 
   01. Share directories with the chroot, (see docs/README-SHARING):
         $ ./setup/local_mounts.sh
@@ -88,7 +87,7 @@ Chromium OS build helper scripts.
      OR
 
       Source ENVIRONMENT for chroot:
-        (cr) source ~/bin/chroot.sh
+        (cr) source ~/bin/environment/chroot.sh
 
       (This will only work after running ./setup/local_mounts.sh)
 
@@ -105,9 +104,9 @@ Chromium OS build helper scripts.
 
      **WARNING: this will of course format the usb stick**
 
-------
- Test
-------
+---------
+ Testing
+---------
 
   (Make sure you are in this directory):
 
@@ -176,5 +175,5 @@ Chromium OS build helper scripts.
       (Press y if you agree)
 
       This will not take very long. 
-      After this is done, i believe the rest should be self explainitory...
+      After this is done, i believe the rest should be self explanitory...
 
