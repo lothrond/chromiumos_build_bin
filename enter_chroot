@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# This setup depends on source from a seperate encrypted drive.
-cryptmount &&
-
 # Go staight into the chroot.
 if [ "$(pwd)" != "${SOURCE_REPO}" ]; then
     cd ${SOURCE_REPO}
-fi; cros_sdk
+fi
+
+# Allow passing args to cros_sdk.
+if [ $# -ne 0 ]; then
+    opt="$@"
+fi
+
+cros_sdk --enter $opt

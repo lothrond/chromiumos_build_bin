@@ -1,13 +1,17 @@
 #!/bin/bash
 
-
 # colors
 colr="\e[31m"
 colg="\e[32m"
 res="\e[0m"
 
+# needs to be in chroot.
+lsblk | grep cros >& /dev/null || \
+    { echo -e "This operation is done in the ${colr}chroot${res}..."; exit 1 ;}
+
 __head__() { echo "$(basename $0) - flash Chromium OS image on a usb stick" ;}
 
+# Show usage
 if [ $# -eq 1 ] && [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
     __head__
     echo
@@ -41,13 +45,21 @@ done
 imagedir=~/trunk/src/build/images/${BOARD}
 
 # Get valid image.
-getimg() { echo -e -n "${colg}Enter disk image:${res}" ;}
+getimg() { echo -e -n "${colg}Enter disk image:${res} " ;}
 getimgfailed() { echo -e "${colr}No valid disk image found in: ${diskimage}${res}" ;}
-valid_dir="ls $imagedir | grep $(echo ${diskimage} | cut -d '/' -f 1) >& /dev/null"
-valid_bin="ls $imagedir | grep $(echo ${diskimage} | cut -d '/' -f 2) >& /dev/null"
+valid_dir() { ls $imagedir | grep $(echo ${diskimage} | cut -d '/' -f 1) || getimgfailed ;}
+valid_image() {
+    local image=$(echo ${diskimage} | cut -d '/' -f 2)
+    case "$image" in
+        base) diskimage=chromiumos_base_image.bin;;
+        dev) diskimage=chromiumos_image.bin;;
+        test) diskimage=chromiumos_test_image.bin;;
+        *) getimgfailed; return 1;;
+    esac
+}
+
 while getimg; read diskimage; do
-    if $valid_dir && $valid_bin; then
-        diskimage="${imagedir}/$(${diskimage} | cut -d '/' -f 1)/chromiumos_$($diskimage | cut -d '/' -f 2).bin"
+    if $valid_dir && valid_image; then
         break
     else
         getimgfailed

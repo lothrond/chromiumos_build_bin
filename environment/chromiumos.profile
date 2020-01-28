@@ -15,17 +15,5 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-## BEGIN CHROMIUM OS BUILD ENVIRONMENT:
-
-SYSTEM_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-USER_PATH=~/bin:~/.local/bin
-DEPOT_TOOLS=~/depot_tools
-
-export PATH=${USER_PATH}:${SYSTEM_PATH}:${DEPOT_TOOLS}
-export SOURCE_REPO=~/chromiumos
-export REPOSYNC="-j8"
-
-# misc
-#GIT_DISCOVERY_ACROSS_FILESYSTEMS=true
-
-## END CHROMIUM OS BUILD ENVIRONMENT.
+# chromiumos
+source ~/bin/environment/host.sh

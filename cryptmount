@@ -3,10 +3,7 @@
 # If your chromiumos source is located on a different drive,
 # (and also encrypted using cryptsetup).
 
-[ $CRYPTDEV ] || CRYPTDEV=/dev/sda
-[ $MAPDEV ] || MAPDEV=moon
-[ $MOUNTLOC ] || MOUNTLOC=/mnt
-[ $MOUNT_SOURCE_REPO ] || MOUNT_SOURCE_REPO=msm255243
+source ~/bin/environment/crypt.sh
 
 link_source() {
     ln -s ${MOUNTLOC}/${MOUNT_SOURCE_REPO} ${SOURCE_REPO}

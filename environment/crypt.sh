@@ -1,0 +1,10 @@
+#!/bin/bash
+
+## BEGIN CRYPTMOUNT ENVIRONMENT:
+
+export CRYPTDEV=/dev/sda
+export MAPDEV=moon
+export MOUNTLOC=/mnt
+export MOUNT_SOURCE_REPO=msm255243
+
+## END CRYPTMOUNT ENVIRONMENT.

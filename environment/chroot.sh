@@ -3,6 +3,7 @@
 ## BEGIN CHROMIUM OS BUILD CHROOT ENVIRONMENT:
 
 export PATH=~/bin:${PATH}
+
 export BOARD=cyan
 export IMAGE=base
 export VERITY=on

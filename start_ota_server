@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# environment
+source ~/bin/environment/host.sh
+source ~/bin/environment/chroot.sh
+source ~/bin/environment/server.sh
+
+# enter chroot and start server
+if [ "$(pwd)" != "${SOURCE_REPO}" ]; then cd ${SOURCE_REPO}; fi
+enter_chroot start_devserver --port ${DEVSERVER_PORT}
