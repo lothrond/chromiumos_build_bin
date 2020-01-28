@@ -32,43 +32,69 @@ echo -e "(Press ${colg}ctrl+c${res} to quit anytime)\n"
 
 # Get a valid usb device, or be yelled at.
 getdev() { echo -e -n "${colg}Enter usb device:${res} " ;}
-getdevfailed() { echo -e "${colr}Not a valid usb device${res}" ;}
+getdevfailed() { echo -e "${colr}Not a valid usb device${res}\n" ;}
 while getdev; read usbdev; do 
     if [ ! -b $usbdev ]; then
         getdevfailed
     else
-        break
+        echo; break
     fi
 done
 
 # disk images
 imagedir=~/trunk/src/build/images/${BOARD}
 
-# Get valid image.
+
+# ui
 getimg() { echo -e -n "${colg}Enter disk image:${res} " ;}
-getimgfailed() { echo -e "${colr}No valid disk image found in: ${diskimage}${res}" ;}
-validdir=$(echo ${diskimage} | cut -d '/' -f 1)
+getimgfailed() { 
+    echo -e "${colr}Not a valid disk image${res}" 
+    echo -e "\nExample:"
+    echo -e "  ${colg}latest/base${res} or ${colg}R81-12858.0.2020_01_25_1731-a1/dev${res}"
+    echo -e "\n(All builds can found in ${imagedir})\n"
+}
+
+# validate build dir
+valid_build() {
+    if [ -d ${imagedir}/${build} ]; then
+        return 0
+    fi
+    return 1
+}
+
+# validate build image
 valid_image() {
-    local image=$(echo ${diskimage} | cut -d '/' -f 2)
     case "$image" in
-        base) diskimage=${imagedir}/${validdir}/chromiumos_base_image.bin;;
-        dev) diskimage=${imagedir}/${validdir}/chromiumos_image.bin;;
-        test) diskimage=${imagedir}/${validdir}/chromiumos_test_image.bin;;
-        *) getimgfailed; return 1;;
+        base) diskimage=${imagedir}/${build}/chromiumos_base_image.bin;;
+        dev) diskimage=${imagedir}/${build}/chromiumos_image.bin;;
+        test) diskimage=${imagedir}/${build}/chromiumos_test_image.bin;;
     esac
+
+    if [ -f "${diskimage}" ]; then
+        return 0
+    fi
+
+    echo -e "${colr}No proper disk image of type: ${image}${res}"
+    echo -e "${colr}found in: ${imagedir}/${build}${res}\n"
+    return 1
 }
 
 while getimg; read diskimage; do
-    if [ -d ${imagedir}/${validdir} ]; then
-        valid_image && break
+    build=$(echo ${diskimage} | cut -d '/' -f 1)
+    image=$(echo ${diskimage} | cut -d '/' -f 2)
+
+    if valid_build && valid_image; then
+        echo; break
     else
         getimgfailed
     fi
 done
 
-# Flash image to usb.
-#echo -e "\nFlashing to usb device: ${colg}${usbdev}${res}"
-#cros flash usb://${usbdev} ${diskimage}
+# info
+echo -e "${colr}Flashing Chromium OS${res}...\n"
+echo -e "${colg}*${res} usb: ${colg}${usbdev}"
+echo -e "${colg}*${res} disk image: ${colg}${diskimage}${res}"
 
-# testing
-echo -e "$usbdev $diskimage"
+# flash
+cros flash usb://${usbdev} ${diskimage}
+
