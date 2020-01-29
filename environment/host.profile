@@ -17,6 +17,9 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# chromiumos_build_bin
+## BEGIN CHROMIUM OS BUILD ENVIRONMENT:
 source ~/bin/environment/host.sh
+## END CHROMIUM OS BUILD ENVIRONMENT.
+## BEGIN CRYPTMOUNT ENVIRONMENT:
 source ~/bin/environment/crypt.sh
+## END CRYPTMOUNT ENVIRONMENT.

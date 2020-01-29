@@ -31,13 +31,19 @@ mount_cryptdev() {
 show_usage() {
     echo "$PRG - $DESC"
     echo
+    echo "** The only purpose of this script is to unlock an encrypted drive, mount it,"
+    echo "   and optionally symbollically link a working source directory somewhere."
+    echo
+    echo "** This script can also unmount/lock the drive, and optionally unlink directory."
+    echo
     echo "USAGE:"
     echo "   $PRG [OPTION]"
     echo
     echo "OPTIONS:"
     echo "   -u,--unmount  unmount device"
     echo "   -m,--mount    mount device"
-    echo "   -s,--sym      symbolically link device to SOURCE_REPO"
+    echo "   -l,--link     symbolically link CRYPTSRC to SOURCE_REPO"
+    echo "   -x,--unlink   unlink SOURCE_REPO"
     echo "   -h,--help     show (this) usage information"
     echo
     echo "EXAMPLES:"
@@ -62,6 +68,7 @@ eval set -- "$opts"
 
 while true; do case "$1" in
     -l|--link) LINK=1; shift 2; break;;
+    -x|--unlink) unlink ${HOSTCRYPT}; break;;
     -m|--mount) mount_cryptdev; break;;
     -u|--unmount) unmount_cryptdev; break;;
     --) shift; break;;

@@ -18,6 +18,9 @@ fi
 # Set up bash autocompletion.
 . ~/trunk/src/scripts/bash_completion
 
-# chromium_build_bin
+## BEGIN CHROMIUM OS BUILD CHROOT ENVIRONMENT:
 source ~/bin/environment/chroot.sh
+## END CHROMIUM OS BUILD CHROOT ENVIRONMENT.
+## BEGIN CHROMIUM OS DEV SERVER ENVIRONMENT:
 source ~/bin/environment/server.sh
+## END CHROMIUM OS DEV SERVER ENVIRONMENT.
