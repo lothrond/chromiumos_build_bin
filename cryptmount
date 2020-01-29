@@ -3,26 +3,24 @@
 # If your chromiumos source is located on a different drive,
 # (and also encrypted using cryptsetup).
 
-source ~/bin/environment/crypt.sh
-
 link_source() {
-    ln -s ${MOUNTLOC}/${MOUNT_SOURCE_REPO} ${SOURCE_REPO}
+    ln -s ${HOSTCRYPT}/${CRYPTSRC} ${SOURCE_REPO}
 }
 
 unmount_cryptdev() {
     # Unmount device
     echo "Unmounting..."
-    sudo umount ${MOUNTLOC}
+    sudo umount ${HOSTCRYPT}
 }
 
 mount_cryptdev() {
     # Open device
     echo "Opening crypt device..."
-    sudo cryptsetup luksOpen ${CRYPTDEV} ${MAPDEV}
+    sudo cryptsetup luksOpen ${CRYPTDEV} ${CRYPTMAP}
 
     # Mount device
     echo "Mounting..."
-    sudo mount /dev/mapper/${MAPDEV} ${MOUNTLOC}
+    sudo mount /dev/mapper/${CRYPTMAP} ${HOSTCRYPT}
 
     # link
     if [ $LINK -eq 1 ]; then

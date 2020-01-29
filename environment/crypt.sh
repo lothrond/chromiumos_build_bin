@@ -3,8 +3,8 @@
 ## BEGIN CRYPTMOUNT ENVIRONMENT:
 
 export CRYPTDEV=/dev/sda
-export MAPDEV=moon
-export MOUNTLOC=/mnt
-export MOUNT_SOURCE_REPO=msm255243
+export CRYPTMAP=moon
+export HOSTCRYPT=/mnt
+export CRYPTSRC=msm255243
 
 ## END CRYPTMOUNT ENVIRONMENT.

@@ -20,5 +20,4 @@ fi
 
 # chromium_build_bin
 source ~/bin/environment/chroot.sh
-source ~/bin/environment/crypt.sh
 source ~/bin/environment/server.sh

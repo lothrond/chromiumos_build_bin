@@ -1,3 +1,5 @@
+# Chromium OS build host user profile.
+#
 # ~/.profile: executed by the command interpreter for login shells.
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists.
 # see /usr/share/doc/bash/examples/startup-files for examples.
@@ -15,5 +17,6 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# chromiumos
+# chromiumos_build_bin
 source ~/bin/environment/host.sh
+source ~/bin/environment/crypt.sh
