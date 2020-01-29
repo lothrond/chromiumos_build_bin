@@ -15,71 +15,117 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Needs to be in chroot.
+# Returns
+RET_0=
+RET_1=
+RET_2=
 
 # Needs user (not root).
 if [ $UID -eq 0 ]; then
     echo "Do not run as root..."; exit 1
 fi
 
-# Needs environment for chroot:
-source ~/bin/environment/chroot.sh
+# Needs to be in chroot.
+in_chroot() {
+    if lsblk | grep cros >& /dev/null; then
+        if [ -f /etc/cros_chroot_version ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
 
-# Check ENVIRONMENT for chroot:
-if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
-    echo "Needs ENVIRONMENT..."; exit 1
-fi
+# Check ENVIRONMENT for chroot
+check_chroot_env() {
+    if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
+        echo "Needs ENVIRONMENT..."; exit 1
+    fi
+}
 
 # Check board name.
-if ! check_board "${BOARD}"; then
-    echo "Checking board failed..."; exit 1
-fi
+check_board() {
+    if ! check_board "${BOARD}"; then
+        echo "Checking board failed..."; exit 1
+    fi
+}
 
 # Check build image type.
-case ${IMAGE} in
-    test) :;;
-    dev) :;;
-    base) :;;
-    *) echo "Failed to determine build image..."; exit 1;;
-esac
+check_build_image() {
+    case ${IMAGE} in
+        test) :;;
+        dev) :;;
+        base) :;;
+        *) echo "Failed to determine build image..."; exit 1;;
+    esac
+}
 
 # Check verified boot status.
-if [ "$VERITY" == "off" ]; then
-    __verity__="--noenable_rootfs_verification"
-fi
+check_verity() {
+    if [ "$VERITY" == "off" ]; then
+        __verity__="--noenable_rootfs_verification"
+    fi
+}
 
 # colors
 colg="\e[32m"
 res="\e[0m"
 
 # Print ENVIRONMENT.
-echo
-echo -e "${colg}*${res} BOARD:  ${BOARD}"
-echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
-echo -e "${colg}*${res} VERITY: ${VERITY}"
-echo
+__printenv__() {
+    echo
+    echo -e "${colg}*${res} BOARD:  ${BOARD}"
+    echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
+    echo -e "${colg}*${res} VERITY: ${VERITY}"
+    echo
+}
 
 # (You should be in the ~/trunk/src/scripts directory).
-if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
-    cd ~/trunk/src/scripts
-fi
+intrunk() {
+    if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
+        cd ~/trunk/src/scripts
+    fi
+}
 
 # Setup new board and shared user password (only needed once).
 # NOTE: you are able to run ./set_shared_user_password.sh
 # manually to set/change the shared user password.
-if [ $# -eq 1 ]; then
-    if [ "$1" == "new" ] || [ "$1" == "force" ]; then
-        if [ "$1" == "force" ]; then
-            flag="--force"
-        fi
-        ./setup_board --board=${BOARD} "$flag"
-        ./set_shared_user_password.sh
-    else
-        echo "USAGE: $(basename $0) [new] [force]"
-    fi
-fi
+__new_setup__() {
+    ./setup_board --board=${BOARD} "$flag"
+    ./set_shared_user_password.sh
+}
 
 # Build all packages and disk image.
-./build_packages --board=${BOARD}
-./build_image --board=${BOARD} ${__verity__} ${IMAGE}
+__build__() {
+    ./build_packages --board=${BOARD}
+    ./build_image --board=${BOARD} ${__verity__} ${IMAGE}
+}
 
+__usage__() {
+    echo "${PROG} - ${DESC}"
+    echo
+    echo "USAGE:"
+    echo ""
+}
+
+# Global options
+PROG=$(basename $0)
+DESC=''
+
+# Options
+aopts=""
+bopts=""
+opts=$(getopt -o $aopts -l $bopts -n "$PROG" -- "$@")
+[$? -eq 0 ] || { exit ${RET_2} ;}
+
+# runtime
+if [ $# -eq 0 ]; then
+    __usage__; exit ${RET_1}
+fi
+
+eval set -- "$opts"
+
+while :; do case "$1" in
+    *) __usage__; exit ${RET_1}; break;;
+esac done
+
+exit $?
