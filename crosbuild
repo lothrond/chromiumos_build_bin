@@ -16,55 +16,14 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Returns
-RET_0=
-RET_1=
-RET_2=
+RET_0=0
+RET_1=1
+RET_2=2
 
 # Needs user (not root).
 if [ $UID -eq 0 ]; then
     echo "Do not run as root..."; exit 1
 fi
-
-# Needs to be in chroot.
-in_chroot() {
-    if lsblk | grep cros >& /dev/null; then
-        if [ -f /etc/cros_chroot_version ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
-# Check ENVIRONMENT for chroot
-check_chroot_env() {
-    if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
-        echo "Needs ENVIRONMENT..."; exit 1
-    fi
-}
-
-# Check board name.
-check_board() {
-    if ! check_board "${BOARD}"; then
-        echo "Checking board failed..."; exit 1
-    fi
-}
-
-# Check build image type.
-check_build_image() {
-    case ${IMAGE} in
-        test) :;;
-        dev) :;;
-        base) :;;
-        *) echo "Failed to determine build image..."; exit 1;;
-    esac
-}
-
-# Check verified boot status.
-check_verity() {
-    if [ "$VERITY" == "off" ]; then
-        __verity__="--noenable_rootfs_verification"
-    fi
-}
 
 # colors
 colg="\e[32m"
@@ -79,24 +38,82 @@ __printenv__() {
     echo
 }
 
-# (You should be in the ~/trunk/src/scripts directory).
-intrunk() {
-    if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
-        cd ~/trunk/src/scripts
+# Prepare build operations.
+__ready_build__() {
+    # Needs to be in chroot.
+    in_chroot() {
+        if lsblk | grep cros >& /dev/null; then
+            if [ -f /etc/cros_chroot_version ]; then
+                return 0
+            fi
+        fi
+        return 1
+    }
+
+    # Check ENVIRONMENT for chroot
+    has_chroot_env() {
+        if ! echo "${BOARD} ${IMAGE} ${VERITY}" > /dev/null; then
+            echo "Needs ENVIRONMENT..."; exit 1
+        fi
+    }
+
+    # Check board name.
+    check_board() {
+        if ! check_board "${BOARD}"; then
+            echo "Checking board failed..."; exit 1
+        fi
+    }
+
+    # Check build image type.
+    check_image() {
+        case ${IMAGE} in
+            test) :;;
+            dev) :;;
+            base) :;;
+            *) echo "Failed to determine build image..."; exit 1;;
+        esac
+    }
+
+    # Check verified boot status.
+    check_verity() {
+        if [ "$VERITY" == "off" ]; then
+            __verity__="--noenable_rootfs_verification"
+        fi
+    }
+
+    # (You should be in the ~/trunk/src/scripts directory).
+    intrunk() {
+        if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
+            cd ~/trunk/src/scripts
+        fi
+    }
+
+    if in_chroot && has_chroot_env; then
+        if check_board && check_image && check_verity; then
+            if intrunk; then
+                return 0
+            fi
+        fi
     fi
+    return 1
 }
 
 # Setup new board and shared user password (only needed once).
 # NOTE: you are able to run ./set_shared_user_password.sh
 # manually to set/change the shared user password.
 __new_setup__() {
+    [ $FORCE -eq 1 ] && flag="--force"
     ./setup_board --board=${BOARD} "$flag"
     ./set_shared_user_password.sh
 }
 
-# Build all packages and disk image.
-__build__() {
+# Build packages.k
+__build_pkgs__() {
     ./build_packages --board=${BOARD}
+}
+
+# Build disk image.
+__build_img__() {
     ./build_image --board=${BOARD} ${__verity__} ${IMAGE}
 }
 
@@ -104,18 +121,42 @@ __usage__() {
     echo "${PROG} - ${DESC}"
     echo
     echo "USAGE:"
-    echo ""
+    echo "    $PROG [OPTIONS] BOARD"
+    echo
+    echo "OPTIONS:"
+    echo "   -i,--image     disk image type"
+    echo "   -n.--new       setup new board"
+    echo "      --force     force new board setup"
+    echo "   -o,--only      build only selected option:"
+    echo "      --packages  only packages"
+    echo "      --image     only disk image"
+    echo "   -v,--verity    enable/disable rw access to rootfs"
+    echo
+    echo "   (-v off = read/write access to rootfs)"
+    echo "   (-v on  = read-only access)"
+    echo
+    echo "EXAMPLES:"
+    echo "   $PROG -i base cyan"
+    echo "   $PROG -i dev -v off cyan"
+    echo
 }
 
 # Global options
 PROG=$(basename $0)
-DESC=''
+DESC='Chromium OS build helper script'
+BOARD=""
+IMAGE=""
+VERITY=""
+NEW=0
+FORCE=0
+ONLYPKGS=0
+ONLYIMG=0
 
 # Options
-aopts=""
-bopts=""
+aopts="n::fivo"
+bopts="new,force,only,packages,image,verity"
 opts=$(getopt -o $aopts -l $bopts -n "$PROG" -- "$@")
-[$? -eq 0 ] || { exit ${RET_2} ;}
+[ $? -eq 0 ] || { exit ${RET_2} ;}
 
 # runtime
 if [ $# -eq 0 ]; then
@@ -125,7 +166,22 @@ fi
 eval set -- "$opts"
 
 while :; do case "$1" in
+    -i,--image) export IMAGE="$2"; shift 2; break;;
+    -v|--verity) export VERITY="$2"; shift 2; break;;
+    -n|--new)
+        case "$2" in
+            -f|--force) FORCE=1; shift 2; break;;
+        esac
+        NEW=1; shift 2; break
+        ;;
+    --) shift; break;;
     *) __usage__; exit ${RET_1}; break;;
 esac done
+
+for x; do
+    if [ $BOARD ]; then
+        :
+    fi
+done
 
 exit $?

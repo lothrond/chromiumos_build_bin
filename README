@@ -97,7 +97,7 @@ Chromium OS build helper scripts.
          before buidling the image.
 
   4. Build Chromium OS:
-       (cr) $ crosbuild new
+       (cr) $ crosbuild --new
 
   5. Flash Chromium OS on to a usb stick.
        (cr) $ usb_flash
@@ -176,4 +176,11 @@ Chromium OS build helper scripts.
 
       This will not take very long. 
       After this is done, i believe the rest should be self explanitory...
+
+---------
+ Extras:
+---------
+
+  Making changes:
+    (see docs/README-MODIFYING)
 

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -o errexit
+
+# all local changes are sourced from a script before building.
+source ~/bin/local_mod.sh
+
+# The first thing you need to do is to mark the package as active.
+cros_workon --board=${BOARD} start ${PACKAGE_NAME}
+
+# sync
+sync_sources
+
+# Create branch for your changes.
+repo start ${BRANCH_NAME}
+
+# (Make changes)
+__mod__
+
+# Incrementally compile changes
+cros_workon_make --board=${BOARD} ${PACKAGE_NAME}
+
+# Install changes to working sources
+cros_workon_make --board=${BOARD} ${PACKAGE_NAME} --install
+
+# (rebuild image)
+crosbuild -o --image
+
+# Cleanup
+cros_workon --board=${BOARD} stop ${PACKAGE_NAME}
