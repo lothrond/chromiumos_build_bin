@@ -2,6 +2,20 @@
 
 set -o errexit
 
+__usage__() {
+    echo "$(basename $0) - modifying sources Chromium OS checked in to gerrit"
+    echo
+    echo "USAGE:"
+    echo "   $(basename $0) path/to/LOCAL_MOD"
+    echo
+    echo "LOCAL_MOD:"
+    echo "   This is a simple script of sorts, containing the desired changes."
+    echo "   All local changes are sourced from this script before re-building."
+    echo "   Building is done using crosbuild, as such additional commands may"
+    echo "   passed "
+    echo "   "
+}
+
 # all local changes are sourced from a script before building.
 source ~/bin/local_mod.sh
 
@@ -24,7 +38,7 @@ cros_workon_make --board=${BOARD} ${PACKAGE_NAME}
 cros_workon_make --board=${BOARD} ${PACKAGE_NAME} --install
 
 # (rebuild image)
-crosbuild -o --image
+__build__
 
 # Cleanup
 cros_workon --board=${BOARD} stop ${PACKAGE_NAME}

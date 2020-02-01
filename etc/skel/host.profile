@@ -17,9 +17,10 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-## BEGIN CHROMIUM OS BUILD ENVIRONMENT:
-source ~/bin/environment/host.sh
-## END CHROMIUM OS BUILD ENVIRONMENT.
-## BEGIN CRYPTMOUNT ENVIRONMENT:
-source ~/bin/environment/crypt.sh
-## END CRYPTMOUNT ENVIRONMENT.
+PATH=~/bin:~/.local/bin:${PATH}:~/depot_tools
+  
+# repo completion
+[ -f "$HOME/etc/repo_bash_completion"   ] && . "$HOME/etc/repo_bash_completion"
+    
+# git prompt
+#export PS1='\h:\W$(__git_ps1 "(%s)") \u\$ '

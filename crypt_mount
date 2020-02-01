@@ -1,0 +1,16 @@
+#!/bin/bash
+
+DEV=/dev/sda
+MAP=crypt
+MNT=/mnt
+
+if [ $# -eq 1 ] && { [ "$1" == "-m" ] || [ "$1" == "--mnt" ] ;}; then
+    sudo cryptsetup luksOpen ${DEV} ${MAP}
+    sudo mount /dev/mapper/${MAP} ${MNT}
+elif [ $# -eq 1 ] && { [ "$1" == "-u" ] || [ "$1" == "--umnt" ] ;}; then
+    sudo umount ${MNT}
+    sudo cryptsetup luksClose ${MAP}
+else
+    echo "USAGE: $(basename $0) [-m,--mnt] [-u,--umnt]"
+fi
+

@@ -153,8 +153,8 @@ ONLYPKGS=0
 ONLYIMG=0
 
 # Options
-aopts="n::fivo"
-bopts="new,force,only,packages,image,verity"
+aopts="n::fivo:"
+bopts="new,force,only,pkgs,image,img,verity"
 opts=$(getopt -o $aopts -l $bopts -n "$PROG" -- "$@")
 [ $? -eq 0 ] || { exit ${RET_2} ;}
 
@@ -174,13 +174,34 @@ while :; do case "$1" in
         esac
         NEW=1; shift 2; break
         ;;
+    -o|--only)
+        case "$2" in
+            --pkgs) ONLYPKGS=1; break;;
+            --img) ONLYIMG=1; break;;
+            *) __usage__; exit ${RET_1}; break;;
+        esac
+        ;;
     --) shift; break;;
     *) __usage__; exit ${RET_1}; break;;
 esac done
 
 for x; do
-    if [ $BOARD ]; then
-        :
+    if [ $ONLYPKGS -eq 1 ] && [ $ONLYIMG -eq 1 ]; then
+        echo "USAGE: [-o --packages] || [-o --image]"; exit ${RET_1}
+    fi
+
+    BOARD="${x}"
+    __ready_build__ && __print_env__
+
+    if [ $NEW -eq 1 ]; then
+        __new_setup__
+    fi
+    if [ $ONLYPKGS -eq 1 ]; then
+        __build_packages__
+    elif [ $ONLYIMG -eq 1 ]; then
+        __build_img__
+    else
+        __build_packages__ && __build_img__
     fi
 done
 

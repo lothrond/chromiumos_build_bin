@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# cyan base image with rootfs verification - first build
+BOARD=cyan
+IMAGE=base
+
+./setup_board --board=${BOARD} ${1}
+./set_shared_user_password.sh
+./build_packages --board=${BOARD}
+./build_image --board=${BOARD} ${IMAGE}
