@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Copyright (C) 2020, Mike Moss <msm255243@gmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# colors
+colr="\e[31m"
+colg="\e[32m"
+res="\e[0m"
+
+# Prepare build operations:
+
+# Needs user (not root).
+if [ $UID -eq 0 ]; then
+    echo "${colr}Do not run as root...${res}"; exit 1
+fi
+
+# Needs to be in chroot.
+if lsblk | grep cros >& /dev/null; then
+    if [ -f /etc/cros_chroot_version ]; then
+        :
+    fi
+else
+    echo -e "Needs to be in the ${colr}chroot${res}"; exit 1
+fi
+
+# Check chroot ENVIRONMENT:
+if ! echo "${BOARD}" > /dev/null; then
+    echo "Needs ${colr}BOARD${res}"
+    failed=1
+fi
+if ! echo "${IMAGE}" > /dev/null; then
+    echo -e "Needs ${colr}IMAGE${res}"
+    failed=1
+fi
+if ! echo "${VERITY}" > /dev/null; then
+    echo -e "Needs ${colr}VERITY${res}"
+    failed=1
+fi
+
+[ "$failed" == "1" ] && { exit 1 ;}
+
+# Check build image:
+case ${IMAGE} in
+    test) :;;
+    dev) :;;
+    base) :;;
+    *) echo "${colr}USAGE:${res} [IMAGE=base] [IMAGE=dev] [IMAGE=test]"; exit 1;;
+esac
+
+# Check verified boot:
+if [ "$VERITY" == "off" ]; then
+    export __verity__="--noenable_rootfs_verification"
+elif [ "$VERITY" == "on" ]; then
+    export __verity__=""
+else
+    echo -e "${olr}USAGE:${res} [VERITY=off] [VERITY=on]"; exit 1
+fi
+
+# (You should be in the ~/trunk/src/scripts directory):
+if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
+    cd ~/trunk/src/scripts
+fi
+
+# Print ENVIRONMENT:
+echo
+echo -e "${colg}*${res} BOARD:  ${BOARD}"
+echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
+echo -e "${colg}*${res} VERITY: ${VERITY}"
+echo

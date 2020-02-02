@@ -1,23 +1,23 @@
 #!/bin/bash
 
-set -o errexit
-
 __usage__() {
     echo "$(basename $0) - modifying sources Chromium OS checked in to gerrit"
     echo
-    echo "USAGE:"
-    echo "   $(basename $0) path/to/LOCAL_MOD"
+    echo "  This script is intended for testing simple changes, on real hardware."
+    echo "  It is to patch the branch with a gerrit submission, before re-building the image for testing."
     echo
-    echo "LOCAL_MOD:"
-    echo "   This is a simple script of sorts, containing the desired changes."
-    echo "   All local changes are sourced from this script before re-building."
-    echo "   Building is done using crosbuild, as such additional commands may"
-    echo "   passed "
-    echo "   "
+    echo "USAGE:"
+    echo "   $(basename $0) path/to/local_patch"
+    echo
+    echo "local_patch:"
+    echo "   This is a script containing variables needed for a unique patch/build."
+    echo "   It can be named anything, and need only contain a few lines of variables."
+    echo "   (There is an example local_patch file to copy in: ~/bin/etc/skel)"
+    echo
 }
 
 # all local changes are sourced from a script before building.
-source ~/bin/local_mod.sh
+[ $# -eq 1  ] && [ -f $1 ] && source "$1"
 
 # The first thing you need to do is to mark the package as active.
 cros_workon --board=${BOARD} start ${PACKAGE_NAME}
@@ -29,7 +29,7 @@ sync_sources
 repo start ${BRANCH_NAME}
 
 # (Make changes)
-__mod__
+${PATCH}
 
 # Incrementally compile changes
 cros_workon_make --board=${BOARD} ${PACKAGE_NAME}
@@ -38,7 +38,15 @@ cros_workon_make --board=${BOARD} ${PACKAGE_NAME}
 cros_workon_make --board=${BOARD} ${PACKAGE_NAME} --install
 
 # (rebuild image)
-__build__
+cd ~/trunk/src/scripts
+if [ "$VERITY" == "off" ]; then
+    VERITY="--noenable_rootfs_verification"
+elif [ "$VERITY" == "on" ]; then
+    unset VERITY
+else
+    echo "USAGE: [VERITY=on] [VERITY=off]"; exit 1
+fi
+./build_image --board=${BOARD} ${VERITY} ${IMAGE}
 
 # Cleanup
 cros_workon --board=${BOARD} stop ${PACKAGE_NAME}

@@ -1,9 +1,4 @@
-
 #!/bin/bash
-
-# cyan base image with rootfs verification
-BOARD=cyan
-IMAGE=base
-
+check_board && check_build || exit 1
 ./build_packages --board=${BOARD}
 ./build_image --board=${BOARD} ${IMAGE}

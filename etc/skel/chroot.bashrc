@@ -14,13 +14,9 @@ if [[ $- != *i* ]] ; then
 fi
 
 # Put your fun stuff here.
+export PATH=~/bin:${PATH}
+source ~/bin/environment/chroot.sh
 
 # Set up bash autocompletion.
 . ~/trunk/src/scripts/bash_completion
-
-## BEGIN CHROMIUM OS BUILD CHROOT ENVIRONMENT:
-source ~/bin/environment/chroot.sh
-## END CHROMIUM OS BUILD CHROOT ENVIRONMENT.
-## BEGIN CHROMIUM OS DEV SERVER ENVIRONMENT:
-source ~/bin/environment/server.sh
-## END CHROMIUM OS DEV SERVER ENVIRONMENT.
+source ~/bin/etc/repo_bash_completion

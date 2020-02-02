@@ -1,0 +1,6 @@
+#!/bin/bash
+check_board && check_build || exit 1
+setup_board --board=${BOARD} ${1}
+./set_shared_user_password.sh
+./build_packages --board=${BOARD}
+./build_image --board=${BOARD} ${IMAGE}

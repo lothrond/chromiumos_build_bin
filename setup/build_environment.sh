@@ -1,0 +1,87 @@
+#!/bin/bash
+
+SOURCE_REPO=~/chromiumos
+REPOSYNC="-j4"
+GIT_USER=""
+GIT_EMAIL=""
+
+# Install the git revision control system, the curl download helper, and lvm tools.
+sudo apt install git-core gitk git-gui curl lvm2 thin-provisioning-tools \
+    python-pkg-resources python-virtualenv python-oauth2client xz-utils
+
+# If you have never used git before, you’ll need to set some global git configurations;
+# substitute $GIT_USER_NAME with your name, and $GIT_USER_EMAIL with your email address.
+if [ ! -f ~/.gitconfig ]; then
+    git config --global user.name "$GIT_USER"
+    git config --global user.email "$GIT_EMAIL"
+    git config --global core.autocrlf false
+    git config --global core.filemode false
+    # and for fun!
+    git config --global color.ui true
+fi
+
+# To set up the Chromium OS build environment, you should turn off the tty_tickets option for sudo,
+# because it is not compatible with cros_sdk.
+cd /tmp
+
+cat > ./sudo_editor <<EOF
+#!/bin/sh
+echo Defaults \!tty_tickets > \$1           # Entering your password in one shell affects all shells
+echo Defaults timestamp_timeout=180 >> \$1  # Time between re-requesting your password, in minutes
+EOF
+
+chmod +x ./sudo_editor
+sudo EDITOR=./sudo_editor visudo -f /etc/sudoers.d/relax_requirements
+
+# Clone the depot_tools repository.
+git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ~/depot_tools
+
+export PATH=${PATH}:~/depot_tools
+
+# Needs chromiumos source code.
+[ $SOURCE_REPO ] || { echo 'missing $SOURCE_REPO'; exit 1 ;}
+
+# Default repo ENVIRONMENT.
+[ $REPOFLAGS ] || REPOFLAGS="-j4"
+
+# Create a directory to hold the source, "${SOURCE_REPO}".
+# (This should not be installed on a remote NFS directory.)
+if [ ! -d $SOURCE_REPO ]; then
+    mkdir -p $SOURCE_REPO
+fi
+
+cd $SOURCE_REPO
+
+# Initialize branch.
+# Chromium OS uses repo to sync down source code. repo is a wrapper for the git that helps deal with a large
+# number of git repositories. (repo is installed with depot_tools).
+repo init -u https://chromium.googlesource.com/chromiumos/manifest.git \
+    --repo-url https://chromium.googlesource.com/external/repo.git
+
+# Optional: Make any changes to .repo/local_manifests/local_manifest.xml before syncing
+#...
+
+# Sync repository.
+# repo can concurrently sync multiple repositories at once. You can adjust the number based on how fast your
+# internet connection is. For the initial sync, it's generally requested that you use no more than 8 concurrent jobs.
+# (For later syncs, when you already have the majority of the source local, using -j16 or so is generally okay.)
+repo sync $REPOSYNC
+
+# The cros_sdk command supports mounting additional directories into your chroot environment.
+# This can be used to share editor configurations, a directory full of recovery images, etc.
+# You can create a src/scripts/.local_mounts file listing all the directories (outside of the chroot)
+# that you'd like to access inside the chroot.
+
+LOCAL_MOUNTS_FILE=${SOURCE_REPO}/src/scripts/.local_mountfs
+
+if [ ! -f ${LOCAL_MOUNTSE_FILE} ]; then
+    touch ${LOCAL_MOUNTS_FILE}
+fi
+
+# Each line of .local_mounts refers to a directory you'd like to mount, and where you'd like it mounted.
+# If there is only one path name, it will be used as both the source and the destination directory. If
+# there are two paths listed on one line, the first is considered to be the path OUTSIDE the chroot and
+# the second will be the path INSIDE the chroot.  The source directory must exist; otherwise, cros_sdk
+# will give off an ugly python error and fail to enter the chroot.
+# (Note: For security and safety reasons, all directories mounted via .local_mounts will be read-only.)
+echo "/home/$(whoami)/bin" > ${LOCAL_MOUNTS_FILE}

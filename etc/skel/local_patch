@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# board name
+#BOARD=""
+#
+# package ebuild
+#PACKAGE=""
+#
+# branch created locally for patching/testing (i.e. BRANCH=test-patch-00)
+#BRANCH=""
+#
+# Intended for a simple one-lined patch command: (i.e. repo download, git pull, etc.)
+#PATCH=""
+#
+# Disk image type: (dev, base, or test)
+#IMAGE=""
+#
+# off - disable rootfs verification for read/write access.
+# on - enable rootfs verification for read-only access.
+#VERITY=""
+#
+#
+BOARD=
+PACKAGE=
+PATCH=
+IMAGE=
+VERITY=

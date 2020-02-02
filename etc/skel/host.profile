@@ -10,17 +10,18 @@
 umask 022
 
 # if running bash
-if [ -n "$BASH_VERSION" ]; then
+if [ $BASH_VERSION ]; then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
+	    source "$HOME/.bashrc"
     fi
 fi
 
-PATH=~/bin:~/.local/bin:${PATH}:~/depot_tools
-  
+# environment
+source ~/bin/environment/host.sh
+
 # repo completion
 [ -f "$HOME/etc/repo_bash_completion"   ] && . "$HOME/etc/repo_bash_completion"
     
 # git prompt
-#export PS1='\h:\W$(__git_ps1 "(%s)") \u\$ '
+export PS1='\h:\e[32m\W$(__git_ps1 "(%s)") \e[34m\u\e[0m:$ '

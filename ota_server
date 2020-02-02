@@ -22,5 +22,5 @@ else
     if [ "$(pwd)" != "${SOURCE_REPO}" ]; then 
         cd ${SOURCE_REPO}
     fi
-    enter_chroot ${devopt}
+    start_chroot -- ${devopt}
 fi

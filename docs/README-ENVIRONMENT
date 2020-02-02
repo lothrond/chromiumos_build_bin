@@ -1,0 +1,33 @@
+================================
+ Chromium OS build environments
+================================
+
+These are a collection of environments used to successfully build Chromium OS
+
+------------------------------------------------------------------------------
+ 
+  host.sh
+    Host machine build environment.
+
+  chroot.sh
+    Chroot environment.
+
+  crypt.sh
+    This environment is for the cryptmount script.
+    For more information about cryptmount, see cryptmount --help.
+    (This is probably not needed)
+
+  server.sh
+    This is used by the dev_server command for ota updates, etc.
+    For more information about devserver, see dev_server --help.
+
+------------------------------------------------------------------------------
+
+To automatically source environments:
+
+ On the host machine:
+   Copy: host.profile to ~/.profile
+
+ Inside the chroot:
+   Copy chroot.bashrc to ~/.bashrc
+

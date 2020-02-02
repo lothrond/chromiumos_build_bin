@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # Needs chromiumos source code.
-[ $SOURCE_REPO ] || { echo 'missing $SOURCE_REPO'; exit 1 ;}
+[ $SOURCE_REPO ] || \
+    SOURCE_REPO=~/chromiumos
 
 # Default repo ENVIRONMENT.
-[ $REPOFLAGS ] || REPOFLAGS="-j4"
+[ $REPOFLAGS ] || \
+    REPOFLAGS="-j4"
 
 # Create a directory to hold the source, "${SOURCE_REPO}".
 # (This should not be installed on a remote NFS directory.)
@@ -29,4 +31,3 @@ repo init -u https://chromium.googlesource.com/chromiumos/manifest.git \
 # (For later syncs, when you already have the majority of the source local, using -j16 or so is generally okay.)
 repo sync $REPOSYNC
 
-exit $?
