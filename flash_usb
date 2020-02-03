@@ -17,9 +17,6 @@ in_chroot() {
 }
 
 # disk images
-imagedir=~/trunk/src/build/images/${BOARD}
-build=$(echo ${diskimage} | cut -d '/' -f 1)
-image=$(echo ${diskimage} | cut -d '/' -f 2)
 
 # validate build dir
 valid_build() {
@@ -122,6 +119,11 @@ show_usage() {
 PROG=$(basename $0)
 DESC="flash a Chromium OS disk image on to a usb flash drive"
 PROMPT=0
+usbdev=""
+diskimage=""
+imagedir=~/trunk/src/build/images/${BOARD}
+build=$(echo ${diskimage} | cut -d '/' -f 1)
+image=$(echo ${diskimage} | cut -d '/' -f 2)
 uopts="pi:u:"
 gopts="prompt,usb,image"
 opts=$(getopt -o $uopts -l $gopts -n "$PROG" -- "$@")

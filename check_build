@@ -66,8 +66,9 @@ else
 fi
 
 # (You should be in the ~/trunk/src/scripts directory):
-if [ "$(pwd)" != "~/trunk/src/scripts" ]; then
-    cd ~/trunk/src/scripts
+if [ "$(pwd)" != "$HOME/trunk/src/scripts" ]; then
+    echo -e "You are not in ${colr}~/trunk/src/scripts${res}"
+    exit 1
 fi
 
 # Print ENVIRONMENT:

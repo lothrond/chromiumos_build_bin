@@ -16,6 +16,7 @@ fi
 # Put your fun stuff here.
 export PATH=~/bin:${PATH}
 source ~/bin/environment/chroot.sh
+source ~/bin/environment/server.sh
 
 # Set up bash autocompletion.
 . ~/trunk/src/scripts/bash_completion
