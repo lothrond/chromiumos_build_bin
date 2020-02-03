@@ -16,6 +16,36 @@ in_chroot() {
     return 1
 }
 
+# disk images
+imagedir=~/trunk/src/build/images/${BOARD}
+build=$(echo ${diskimage} | cut -d '/' -f 1)
+image=$(echo ${diskimage} | cut -d '/' -f 2)
+
+# validate build dir
+valid_build() {
+    if [ -d ${imagedir}/${build} ]; then
+        return 0
+    fi
+    return 1
+}
+
+# validate build image
+valid_image() {
+    case "$image" in
+        base) diskimage=${imagedir}/${build}/chromiumos_base_image.bin;;
+        dev) diskimage=${imagedir}/${build}/chromiumos_image.bin;;
+        test) diskimage=${imagedir}/${build}/chromiumos_test_image.bin;;
+    esac
+
+    if [ -f "${diskimage}" ]; then
+        return 0
+    fi
+
+    echo -e "${colr}No proper disk image of type: ${image}${res}"
+    echo -e "${colr}found in: ${imagedir}/${build}${res}\n"
+    return 1
+}
+
 interactive_runtime() {
     # Print informational header.
     echo "${PROG} - ${DESC}"
@@ -33,9 +63,6 @@ interactive_runtime() {
         fi
     done
 
-    # disk images
-    imagedir=~/trunk/src/build/images/${BOARD}
-
     # ui
     getimg() { echo -e -n "${colg}Enter disk image:${res} " ;}
     getimgfailed() { 
@@ -45,35 +72,7 @@ interactive_runtime() {
         echo -e "\n(All builds can found in ${imagedir})\n"
     }
 
-    # validate build dir
-    valid_build() {
-        if [ -d ${imagedir}/${build} ]; then
-            return 0
-        fi
-        return 1
-    }
-
-    # validate build image
-    valid_image() {
-        case "$image" in
-            base) diskimage=${imagedir}/${build}/chromiumos_base_image.bin;;
-            dev) diskimage=${imagedir}/${build}/chromiumos_image.bin;;
-            test) diskimage=${imagedir}/${build}/chromiumos_test_image.bin;;
-        esac
-
-        if [ -f "${diskimage}" ]; then
-            return 0
-        fi
-
-        echo -e "${colr}No proper disk image of type: ${image}${res}"
-        echo -e "${colr}found in: ${imagedir}/${build}${res}\n"
-        return 1
-    }
-
     while getimg; read diskimage; do
-        build=$(echo ${diskimage} | cut -d '/' -f 1)
-        image=$(echo ${diskimage} | cut -d '/' -f 2)
-
         if valid_build && valid_image; then
             echo; break
         else
@@ -85,7 +84,7 @@ interactive_runtime() {
 flash_usb() {
     # info
     echo -e "${colr}Flashing Chromium OS${res}\n"
-    echo -e "${colg}*${res} usb: ${colg}${usbdev}"
+    echo -e "${colg}*${res} usb: ${colg}${usbdev}${res}"
     echo -e "${colg}*${res} disk image: ${colg}${diskimage}${res}"
 
     # flash
@@ -125,10 +124,10 @@ DESC="flash a Chromium OS disk image on to a usb flash drive"
 PROMPT=0
 uopts="pi:u:"
 gopts="prompt,usb,image"
-opts=$(getopt -o $uopt -l $gopt -n "$PROG" -- "$@")
+opts=$(getopt -o $uopts -l $gopts -n "$PROG" -- "$@")
 [ $? -eq 0 ] || { exit 1 ;}
 
-if [ $? -eq 0 ]; then
+if [ $# -eq 0 ]; then
     show_usage; exit 1
 fi
 
@@ -136,8 +135,8 @@ eval set -- "$opts"
 
 while :; do case "$1" in
     -p|--prompt) PROMPT=1; break;;
-    -u|--usb) usbdev="$2"; shift 2; break;;
-    -i|--image) diskimage="$2"; shift 2; break;;
+    -u|--usb) usbdev="$2"; shift 2; continue;;
+    -i|--image) diskimage="$2"; shift 2; continue;;
     --) shift; break;;
     *) show_usage; exit 1; break;;
 esac done
@@ -146,7 +145,9 @@ if in_chroot; then
     if [ $PROMPT -eq 1 ]; then
         interactive_prompt
     fi
-    flash_usb
+    if valid_build && valid_image; then
+        flash_usb
+    fi
 fi
 
 exit $?

@@ -24,21 +24,29 @@ res="\e[0m"
 
 # Needs user (not root).
 if [ $UID -eq 0 ]; then
-    echo "${colr}Do not run as root...${res}"; exit 1
+    echo -e "${colr}Do not run as root.${res}"; exit 1
 fi
 
 # Needs to be in chroot.
 lsblk | grep cros >& /dev/null && [ -f "/etc/cros_chroot_version" ] || \
-    echo -e "Needs to be in the ${colr}chroot${res}"; exit 1
+    { echo -e "You Need to be in the ${colr}chroot${res}."; exit 1 ;}
 
 # Check chroot ENVIRONMENT:
-[ ${BOARD} ] || \
+failed=0
+if ! echo ${BOARD} >& /dev/null; then
     echo -e "Needs ${colr}BOARD${res}"; failed=1
-[ ${IMAGE} ] || \
+fi
+if ! echo ${IMAGE} >& /dev/null; then
     echo -e "Needs ${colr}IMAGE${res}"; failed=1
-[ ${VERITY} ] || \
+fi
+if ! echo ${VERITY} >& /dev/null; then
     echo -e "Needs ${colr}VERITY${res}"; failed=1
-[ "$failed" == "1" ] && { exit 1 ;}
+fi
+if [ "$failed" == "1" ]; then
+    exit 1
+fi
+
+unset failed
 
 # Check build image:
 case ${IMAGE} in
@@ -54,7 +62,7 @@ if [ "$VERITY" == "off" ]; then
 elif [ "$VERITY" == "on" ]; then
     export __verity__=""
 else
-    echo -e "${olr}USAGE:${res} [VERITY=off] [VERITY=on]"; exit 1
+    echo -e "${colr}USAGE:${res} [VERITY=off] [VERITY=on]"; exit 1
 fi
 
 # (You should be in the ~/trunk/src/scripts directory):
