@@ -5,3 +5,9 @@
  go to:
    https://chromium.googlesource.com/chromiumos/docs/+/master/gsutil.md
 
+ run the following inside ${SOURCE_REPO}:
+   chromite/scripts/gsutil
+   chromite/scripts/gsutil config
+
+ When prompted for a project ID, enter chromeos-bot (this is the main Chrome OS project ID).
+ 

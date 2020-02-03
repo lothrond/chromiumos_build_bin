@@ -1,17 +1,8 @@
-========================
-chromiumos_build_bin
-========================
+======================
+ chromiumos_build_bin
+======================
 
 Chromium OS build helper scripts.
-
---------------
- Requirements 
---------------
-
- o RAM: 8-16GB
- o Disk Space: 135-250GB
- o Network: (decent speed)
- o (google account)
 
 --------------
  Manual Setup
@@ -23,10 +14,11 @@ Chromium OS build helper scripts.
   01. Change into it:
         $ cd ~/bin
 
-  02. Source build ENVIRONMENT for host:
-        $ source ./environment/host.sh
+  02. Source build environment for host:
+        $ source environment/host.sh
 
-      (Consider adding to your .bashrc)
+      To automatic source host environment on login, run:
+        $ ./setup/host_environment.sh
 
   03. Install git and curl (and lvm tools):
         $ ./setup/install_git_and_curl.sh
@@ -46,6 +38,13 @@ Chromium OS build helper scripts.
         $ ./setup/source_checkout.sh
 
   09. Setup google API keys, (see docs/README-APIKEYS).
+  
+      Do one of the following:
+        a) supply API keys in ~/.googleapikeys (HOST)
+        b) supply API keys at runtime in /etc/chrome_dev.conf (DUT)
+
+      ** option 'a' needs to be done before running `cros_sdk` on the host system.
+         option 'b' requires r/w access on the dut device.
 
   10. Setup authorization for google storage buckets, (see docs/README-GSBUCKETS).
 
@@ -53,10 +52,7 @@ Chromium OS build helper scripts.
  Manual Build
 --------------
 
-  00. Make sure you either:
-        a) have ~/.googleapikeys populated correctly
-        b) supply API keys at runtime in /etc/chrome_dev.conf
-
+  
   01. Share directories with the chroot, (see docs/README-SHARING):
         $ ./setup/local_mounts.sh
 
@@ -96,11 +92,14 @@ Chromium OS build helper scripts.
       ** If you would like to build for another board, you will need to modify environment/chroot.sh 
          before buidling the image.
 
-  4. Build Chromium OS:
-       (cr) $ crosbuild --new
+      To automatic source chroot environment on entry, run:
+        (cr) ~/bin/setup/chroot_environment.sh
 
-  5. Flash Chromium OS on to a usb stick.
-       (cr) $ usb_flash
+  4. Build a new Chromium OS disk image:
+       (cr) $ build_new
+
+  5. Flash the disk image on to a usb stick.
+       (cr) $ flash_usb
 
      **WARNING: this will of course format the usb stick**
 
@@ -177,6 +176,33 @@ Chromium OS build helper scripts.
       This will not take very long. 
       After this is done, i believe the rest should be self explanitory...
 
+------------------
+ Manual Updating:
+------------------
+
+ (This assumes no personal modifications have been applied to the source code.)
+
+ After a manual setup is complete, and having done at lest one manual build,
+ a basic update would be as follows:
+
+   sync sources
+   enter build chroot
+   build packages
+   build disk image
+   flash disk image
+
+ 00. sync sources:
+       sync_sources
+
+ 01. enter build chroot:
+       start_chroot
+
+ 02. build_packages, build disk image:
+       build
+
+ 03. flash disk image:
+       flash_usb
+
 ---------
  Extras:
 ---------
@@ -184,3 +210,7 @@ Chromium OS build helper scripts.
   Making changes:
     (see docs/README-MODIFYING)
 
+  Storing sources on a seperate encrypted disk:
+    (see docs/README-ENVIRONMENT)
+  
+  (more to come)
