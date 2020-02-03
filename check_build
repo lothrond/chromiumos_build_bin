@@ -28,28 +28,16 @@ if [ $UID -eq 0 ]; then
 fi
 
 # Needs to be in chroot.
-if lsblk | grep cros >& /dev/null; then
-    if [ -f /etc/cros_chroot_version ]; then
-        :
-    fi
-else
+lsblk | grep cros >& /dev/null && [ -f "/etc/cros_chroot_version" ] || \
     echo -e "Needs to be in the ${colr}chroot${res}"; exit 1
-fi
 
 # Check chroot ENVIRONMENT:
-if ! echo "${BOARD}" > /dev/null; then
-    echo "Needs ${colr}BOARD${res}"
-    failed=1
-fi
-if ! echo "${IMAGE}" > /dev/null; then
-    echo -e "Needs ${colr}IMAGE${res}"
-    failed=1
-fi
-if ! echo "${VERITY}" > /dev/null; then
-    echo -e "Needs ${colr}VERITY${res}"
-    failed=1
-fi
-
+[ ${BOARD} ] || \
+    echo -e "Needs ${colr}BOARD${res}"; failed=1
+[ ${IMAGE} ] || \
+    echo -e "Needs ${colr}IMAGE${res}"; failed=1
+[ ${VERITY} ] || \
+    echo -e "Needs ${colr}VERITY${res}"; failed=1
 [ "$failed" == "1" ] && { exit 1 ;}
 
 # Check build image:
@@ -57,7 +45,7 @@ case ${IMAGE} in
     test) :;;
     dev) :;;
     base) :;;
-    *) echo "${colr}USAGE:${res} [IMAGE=base] [IMAGE=dev] [IMAGE=test]"; exit 1;;
+    *) echo -e "${colr}USAGE:${res} [IMAGE=base] [IMAGE=dev] [IMAGE=test]"; exit 1;;
 esac
 
 # Check verified boot:
