@@ -16,11 +16,9 @@ in_chroot() {
     return 1
 }
 
-# disk images
-
 # validate build dir
 valid_build() {
-    if [ -d ${imagedir}/${build} ]; then
+    if [ -d "${imagedir}/$(${1} | cut -d '/' -f 1)" ]; then
         return 0
     fi
     return 1
@@ -28,39 +26,46 @@ valid_build() {
 
 # validate build image
 valid_image() {
+    local build=$(echo ${1} | cut -d '/' -f 1)
+    local image=$(echo ${1} | cut -d '/' -f 2)
     case "$image" in
         base) diskimage=${imagedir}/${build}/chromiumos_base_image.bin;;
         dev) diskimage=${imagedir}/${build}/chromiumos_image.bin;;
         test) diskimage=${imagedir}/${build}/chromiumos_test_image.bin;;
     esac
-
     if [ -f "${diskimage}" ]; then
         return 0
     fi
-
     echo -e "${colr}No proper disk image of type: ${image}${res}"
     echo -e "${colr}found in: ${imagedir}/${build}${res}\n"
     return 1
 }
 
-interactive_runtime() {
-    # Print informational header.
+print_informational_header() {
     echo "${PROG} - ${DESC}"
     echo -e "\n(Run with ${colg}-h${res} or ${colg}--help${res} for more information)"
     echo -e "(Press ${colg}ctrl+c${res} to quit anytime)\n"
+    in_chroot &&
+    get_valid_usb_device_or_be_yelled_at && get_valid_disk_image_or_be_yelled_at
+}
 
-    # Get a valid usb device, or be yelled at.
+get_valid_usb_device_or_be_yelled_at() {
+    local usb
     getdev() { echo -e -n "${colg}Enter usb device:${res} " ;}
     getdevfailed() { echo -e "${colr}Not a valid usb device${res}\n" ;}
-    while getdev; read usbdev; do 
-        if [ ! -b $usbdev ]; then
+    while getdev; read usb; do 
+        if [ ! -b $usb ]; then
             getdevfailed
         else
-            echo; break
+            echo
+            usbbdev="${usb}"
+            break
         fi
     done
+}
 
-    # ui
+ get_valid_disk_image_or_be_yelled_at() {
+    local img
     getimg() { echo -e -n "${colg}Enter disk image:${res} " ;}
     getimgfailed() { 
         echo -e "${colr}Not a valid disk image${res}" 
@@ -68,10 +73,11 @@ interactive_runtime() {
         echo -e "  ${colg}latest/base${res} or ${colg}R81-12858.0.2020_01_25_1731-a1/dev${res}"
         echo -e "\n(All builds can found in ${imagedir})\n"
     }
-
-    while getimg; read diskimage; do
-        if valid_build && valid_image; then
-            echo; break
+    while getimg; read img; do
+        if valid_build ${img} && valid_image ${img}; then
+            echo
+            diskimage="${img}"
+            break
         else
             getimgfailed
         fi
@@ -90,6 +96,11 @@ flash_usb() {
     else
         echo -e "\n${colr}Failed.${res}"; exit 1
     fi
+}
+
+interactive_prompt() {
+    print_informational_header
+    :
 }
 
 show_usage() {
@@ -122,8 +133,6 @@ PROMPT=0
 usbdev=""
 diskimage=""
 imagedir=~/trunk/src/build/images/${BOARD}
-build=$(echo ${diskimage} | cut -d '/' -f 1)
-image=$(echo ${diskimage} | cut -d '/' -f 2)
 uopts="pi:u:"
 gopts="prompt,usb,image"
 opts=$(getopt -o $uopts -l $gopts -n "$PROG" -- "$@")
@@ -137,8 +146,8 @@ eval set -- "$opts"
 
 while :; do case "$1" in
     -p|--prompt) PROMPT=1; break;;
-    -u|--usb) usbdev="$2"; shift 2; continue;;
-    -i|--image) diskimage="$2"; shift 2; continue;;
+    -u|--usb) usbdev="$2"; shift 2; break;;
+    -i|--image) diskimage="$2"; shift 2; break;;
     --) shift; break;;
     *) show_usage; exit 1; break;;
 esac done
