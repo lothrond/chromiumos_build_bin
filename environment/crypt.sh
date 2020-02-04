@@ -3,8 +3,7 @@
 ## BEGIN CRYPTMOUNT ENVIRONMENT:
 
 export CRYPTDEV=/dev/sda
-export CRYPTMAP=moon
-export HOSTCRYPT=/mnt
-export CRYPTSRC=msm255243
+export CRYPTMAP=croscrypt
+export CRYPTMNT=/mnt
 
 ## END CRYPTMOUNT ENVIRONMENT.

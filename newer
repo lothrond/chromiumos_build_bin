@@ -1,0 +1,4 @@
+#!/bin/bash
+source ~/bin/environment/chroot.sh &&\
+source ~/bin/environment/server.sh &&\
+build && flash_usb -i ${AUTOBUILD} -u ${USBDEV}

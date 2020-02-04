@@ -1,0 +1,14 @@
+#!/bin/bash
+
+## BEGIN DEFAULT AUTOBUILD ENVIRONMENT:
+
+[ $AUTOBUILD ] || AUTOBUILD=latest/base
+[ $USBDEV ] || USBDEV=/dev/sdc
+
+## END DEFAULT AUTOBUILD ENVIRONMENT.
+
+# source is on encrypted storage
+crypt_mount -m
+
+# enter build chroot, build, then flash the image to a usb stick.
+start_chroot -- ~/bin/newer

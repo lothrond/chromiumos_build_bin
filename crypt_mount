@@ -1,15 +1,13 @@
 #!/bin/bash
 
-DEV=/dev/sda
-MAP=crypt
-MNT=/mnt
-
 if [ $# -eq 1 ] && { [ "$1" == "-m" ] || [ "$1" == "--mnt" ] ;}; then
-    sudo cryptsetup luksOpen ${DEV} ${MAP}
-    sudo mount /dev/mapper/${MAP} ${MNT}
+    echo "Adding encrypted storage..."
+    sudo cryptsetup luksOpen ${CRYPTDEV} ${CRYPTMAP}
+    sudo mount /dev/mapper/${CRYPTMAP} ${CRYPTMNT}
 elif [ $# -eq 1 ] && { [ "$1" == "-u" ] || [ "$1" == "--umnt" ] ;}; then
-    sudo umount ${MNT}
-    sudo cryptsetup luksClose ${MAP}
+    echo "Removing encrypted storage..."
+    sudo umount ${CRYPTMNT}
+    sudo cryptsetup luksClose ${CRYPTMAP}
 else
     echo "USAGE: $(basename $0) [-m,--mnt] [-u,--umnt]"
 fi
