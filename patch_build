@@ -14,10 +14,19 @@ __usage__() {
     echo "   It can be named anything, and need only contain a few lines of variables."
     echo "   (There is an example local_patch file to copy in: ~/bin/etc/skel)"
     echo
+    echo " ** When applying a patch, all changes will always be applied on TOP of sources,
+    echo "    after running any new repo sync command."
+    echo
+    echo " ** To stop this, abandon your local branch with: repo abandon ${LOCAL_BRANCH}"
+    echo
 }
 
 # all local changes are sourced from a script before building.
-[ $# -eq 1  ] && [ -f $1 ] && source "$1"
+if [ $# -eq 1  ] && [ -f $1 ]; then 
+    source "$1"
+else
+    __usage__; exit 1
+fi
 
 # The first thing you need to do is to mark the package as active.
 cros_workon --board=${BOARD} start ${PACKAGE_NAME}

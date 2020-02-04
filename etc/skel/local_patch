@@ -1,27 +1,30 @@
 #!/bin/bash
 #
-# board name
-#BOARD=""
+# Board name
+# BOARD=""
 #
-# package ebuild
-#PACKAGE=""
+# Package ebuild name.
+# (example: PACKAGE="chromeos-base/mems_setup")
 #
-# branch created locally for patching/testing (i.e. BRANCH=test-patch-00)
-#BRANCH=""
+# Branch created locally for patching/testing (i.e. BRANCH=test-patch-00)
+# (example: BRANCH="fix-battery-00")
 #
 # Intended for a simple one-lined patch command: (i.e. repo download, git pull, etc.)
-#PATCH=""
+# (example: PATCH="repo download 45723455/8")
 #
 # Disk image type: (dev, base, or test)
-#IMAGE=""
+# (example: IMAGE="dev")
 #
+# boot verification:
 # off - disable rootfs verification for read/write access.
 # on - enable rootfs verification for read-only access.
-#VERITY=""
+# (example: VERITY="off)"
 #
+#======================================================================================
 #
-BOARD=
-PACKAGE=
-PATCH=
-IMAGE=
-VERITY=
+#PACKAGE=""
+#BRANCH=""
+#PATCH=""
+#BOARD=${BOARD}
+#IMAGE=${IMAGE}
+#VERITY=${VERITY}

@@ -17,8 +17,9 @@ in_chroot() {
 }
 
 # validate build dir
-valid_build() {
-    if [ -d "${imagedir}/$(${1} | cut -d '/' -f 1)" ]; then
+valid_build() { 
+    local build=$(echo "${diskimage}" | cut -d '/' -f 1) 
+    if [ -d "${imagedir}/${build}" ]; then
         return 0
     fi
     return 1
@@ -26,8 +27,8 @@ valid_build() {
 
 # validate build image
 valid_image() {
-    local build=$(echo ${1} | cut -d '/' -f 1)
-    local image=$(echo ${1} | cut -d '/' -f 2)
+    local build=$(echo ${diskimage} | cut -d '/' -f 1)
+    local image=$(echo ${diskimage} | cut -d '/' -f 2)
     case "$image" in
         base) diskimage=${imagedir}/${build}/chromiumos_base_image.bin;;
         dev) diskimage=${imagedir}/${build}/chromiumos_image.bin;;
@@ -45,8 +46,6 @@ print_informational_header() {
     echo "${PROG} - ${DESC}"
     echo -e "\n(Run with ${colg}-h${res} or ${colg}--help${res} for more information)"
     echo -e "(Press ${colg}ctrl+c${res} to quit anytime)\n"
-    in_chroot &&
-    get_valid_usb_device_or_be_yelled_at && get_valid_disk_image_or_be_yelled_at
 }
 
 get_valid_usb_device_or_be_yelled_at() {
@@ -99,8 +98,14 @@ flash_usb() {
 }
 
 interactive_prompt() {
-    print_informational_header
-    :
+    if print_informational_header && in_chroot; then
+        if get_valid_usb_device_or_be_yelled_at; then
+            if get_valid_disk_image_or_be_yelled_at; then
+                return 0
+            fi
+        fi
+    fi
+    return 1
 }
 
 show_usage() {
@@ -130,8 +135,8 @@ show_usage() {
 PROG=$(basename $0)
 DESC="flash a Chromium OS disk image on to a usb flash drive"
 PROMPT=0
-usbdev=""
-diskimage=""
+#usbdev=""
+#diskimage=""
 imagedir=~/trunk/src/build/images/${BOARD}
 uopts="pi:u:"
 gopts="prompt,usb,image"
@@ -146,18 +151,23 @@ eval set -- "$opts"
 
 while :; do case "$1" in
     -p|--prompt) PROMPT=1; break;;
-    -u|--usb) usbdev="$2"; shift 2; break;;
-    -i|--image) diskimage="$2"; shift 2; break;;
+    -u|--usb) usbdev="$2"; shift 2; continue;;
+    -i|--image) diskimage="$2"; shift 2; continue;;
     --) shift; break;;
     *) show_usage; exit 1; break;;
 esac done
 
 if in_chroot; then
     if [ $PROMPT -eq 1 ]; then
-        interactive_prompt
-    fi
-    if valid_build && valid_image; then
-        flash_usb
+        interactive_prompt && flash_usb
+    else
+        if echo "${usbdev}" >& /dev/null && [ -b "$usbdev" ]; then
+            if valid_build ${diskimage} && valid_image ${diskimage}; then
+                flash_usb
+            fi
+        else
+            echo -e "${colr}No valid usb device found.${res}"
+        fi
     fi
 fi
 
