@@ -1,0 +1,9 @@
+#
+# Chromium OS build jobs
+#
+
+# sync sources every tuesday, thursday, and sunday, at 10:30 pm (EST)
+30 10 * * 2,4,7  msm255243  /home/msm255243/bin/sync_sources
+
+# build disk image every monday at 10:30
+30 10 * * 1  msm255243  /home/msm255243/bin/autobuild

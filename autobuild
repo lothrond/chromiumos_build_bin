@@ -2,7 +2,7 @@
 
 ## BEGIN DEFAULT AUTOBUILD ENVIRONMENT:
 
-[ $AUTOBUILD ] || AUTOBUILD=latest/base
+[ $AUTOBUILD ] || AUTOBUILD=${IMAGE}
 [ $USBDEV ] || USBDEV=/dev/sdc
 
 ## END DEFAULT AUTOBUILD ENVIRONMENT.
@@ -11,4 +11,4 @@
 crypt_mount -m
 
 # enter build chroot, build, then flash the image to a usb stick.
-start_chroot -- ~/bin/newer
+start_chroot -- ~/bin/newer ${USBDEV}
