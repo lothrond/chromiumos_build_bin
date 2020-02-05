@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# dev_server runtime option
-devopt="start_devserver --port ${DEVSERVER_PORT}"
+# Needs server environment
+if ! echo "${DEVSERVER_PORT} ${SOURCE_REPO}" >& /dev/null; then
+    echo "Failed to determine devserver environment..."
+    exit 1
+fi
 
-# verify chroot
+# Needs to be in chroot
 in_chroot() {
     if [ -f /etc/cros_chroot_version ]; then
         if lsblk | grep -q cros >& /dev/null; then
@@ -13,14 +16,16 @@ in_chroot() {
     return 1
 }
 
-# If already inside the chroot, start the server.
+# If already inside the chroot, start devserver.
 # Otherwise, enter the chroot first.
 if in_chroot; then
-    ${devopt}
+    start_devserver --port ${DEVSERVER_PORT}
 else
     # needs to be in source repo
     if [ "$(pwd)" != "${SOURCE_REPO}" ]; then 
         cd ${SOURCE_REPO}
     fi
-    start_chroot -- ${devopt}
+    start_chroot -- start_devserver --port ${DEVSERVER_PORT}
 fi
+
+exit $?
