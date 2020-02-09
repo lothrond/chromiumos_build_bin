@@ -1,5 +1,14 @@
 #!/bin/bash
-#
-# a script to wrap sync commands for auto-building, crontabs, etc.
+
+# A script to wrap sync commands for auto-building, cron, etc.
 echo "Running automatic repository syncronization..."
-source ~/bin/environment/host.sh && ~/bin/sync_sources
+
+# source user environment
+source ~/.profile
+source ~/.bashrc
+
+# source Chromium OS environment
+source ~/bin/environment/host.sh
+
+# repo sync
+~/bin/sync_sources

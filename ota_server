@@ -6,26 +6,17 @@ if ! echo "${DEVSERVER_PORT} ${SOURCE_REPO}" >& /dev/null; then
     exit 1
 fi
 
-# Needs to be in chroot
-in_chroot() {
-    if [ -f /etc/cros_chroot_version ]; then
-        if lsblk | grep -q cros >& /dev/null; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
 # If already inside the chroot, start devserver.
 # Otherwise, enter the chroot first.
-if in_chroot; then
-    start_devserver --port ${DEVSERVER_PORT}
-else
-    # needs to be in source repo
-    if [ "$(pwd)" != "${SOURCE_REPO}" ]; then 
-        cd ${SOURCE_REPO}
+if lsblk | grep -q cros >& /dev/null; then
+    if [ -f /etc/cros_chroot_version ]; then
+        start_devserver --port ${DEVSERVER_PORT}
     fi
-    start_chroot -- start_devserver --port ${DEVSERVER_PORT}
 fi
 
-exit $?
+# needs to be in source repo
+if [ "$(pwd)" != "${SOURCE_REPO}" ]; then 
+    cd ${SOURCE_REPO}
+fi
+
+start_chroot -- start_devserver --port ${DEVSERVER_PORT}

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# source is on encrypted storage
+crypt_mount -m
+
+# enter build chroot, build, then flash the image to a usb stick.
+start_chroot -- ~/bin/newer ${USBDEV}

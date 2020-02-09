@@ -49,11 +49,23 @@ fi
 unset failed
 
 # Check build image:
-case ${IMAGE} in
-    test) :;;
-    dev) :;;
-    base) :;;
-    *) echo -e "${colr}USAGE:${res} [IMAGE=base] [IMAGE=dev] [IMAGE=test]"; exit 1;;
+case "${IMAGE}" in
+    "test") :;;
+    "test base") :;;
+    "test dev") :;;
+    "test base dev") :;;
+    "test dev base") :;;
+    "dev") :;;
+    "dev base") :;;
+    "dev test") :;;
+    "dev base test") :;;
+    "dev test base") :;;
+    "base") :;;
+    "base dev") :;;
+    "base test") :;;
+    "base dev test") :;;
+    "base test dev") :;;
+    "*") echo -e "${colr}USAGE:${res} IMAGE=[\"base dev test\"]"; exit 1;;
 esac
 
 # Check verified boot:
@@ -63,6 +75,18 @@ elif [ "$VERITY" == "on" ]; then
     export __verity__=""
 else
     echo -e "${colr}USAGE:${res} [VERITY=off] [VERITY=on]"; exit 1
+fi
+
+# Optionally set cpu frequency governer to performance mode.
+if [ $PERFORMANCE -eq 0 ]; then
+    :
+elif [ $PERFORMANCE -eq 1 ]; then
+    function set_cpu_gov() {
+        echo "Setting cpu governer to ${colg}performance${res} mode..."
+        sudo cpupower set frequency-scale -g performance
+    }
+else
+    echo -e "${colr}USAGE:${res} PERFORMANCE=[0|1]"; exit 1
 fi
 
 # (You should be in the ~/trunk/src/scripts directory):
