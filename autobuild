@@ -4,17 +4,11 @@ show_usage() {
     echo "$PROG - $DESC"
     echo
     echo "USAGE:"
-    echo "   $PROG [-c|--crypt] [-x|--start]" 
-    echo "   $PROG [-b|--build]"
+    echo "   $PROG [OPTION]" 
     echo
     echo "OPTIONS:"
-    echo "   -c,--crypt  source is on encrypted device"
     echo "   -b,--build  this is the build operation performed in the chroot"
     echo "   -x,--start  enter chroot, and perform the --build option."
-    echo
-    echo "EXAMPLES:"
-    echo "   $PROG -x"
-    echo "   $PROG --crypt --start"
     echo
 }
 
@@ -27,24 +21,11 @@ valid_autodev() {
     return 1
 }
 
-# Needs AUTOBUILD 
-valid_autobuild () {
-    case "${AUTOBUILD}" in
-        base) return 0;;
-        dev) return 0;;
-        test) return 0;;
-    esac
-    echo "Unable to determine disk image type: ${AUTOBUILD}"
-    return 1
-}
-
-
 __host__() {
     echo "Running host operation:"
-    if [ "$ENCRYPTED" -eq 1 ]; then
-        crypt_mount -m
-    fi
     start_chroot -- ~/bin/autobuild --build
+}
+
 __chroot__() {
     echo "Running chroot operation:"
     source ~/bin/environment/chroot.sh
@@ -55,11 +36,10 @@ __chroot__() {
 
 PROG=$(basename $0)
 DESC='Chromium OS autobuilder'
-ENCRYPTED=0
 ABHOST=0
 ABCHROOT=0
-uopts="cbx"
-gopts="build,start,crypt"
+uopts="bs"
+gopts="build,start"
 opts=$(getopt -o $uopts -l $gopts -n "$PROG" -- "$@")
 [ $? -eq 0 ] || { exit 1 ;}
 
@@ -70,9 +50,8 @@ fi
 eval set -- "$opts"
 
 while true; do case "$1" in
-    c|crypt) ENCRYPTED=1; shift 2; break;;
-    x|start) ABHOST=1; break;;
-    b|build) ABCHROOT=1; break;;
+    -s|--start) ABHOST=1; break;;
+    -b|--build) ABCHROOT=1; break;;
     --) shift; break;;
     *) show_usage; exit 1; break;;
 esac done
@@ -82,17 +61,15 @@ if [ "$ABHOST" -eq 1 ] && [ "$ABCHROOT" -eq 1 ]; then
 fi
 
 if [ "$ABHOST" -eq 1 ]; then
-    if valid_autodev && valid_autobuild && __host__; then
+    if valid_autodev && __host__; then
         exit 0
     fi
 fi
 
 if [ "$ABCHROOT" -eq 1 ]; then
-    if valid_autodev && valid_autobuild && __chroot__; then
+    if valid_autodev && __chroot__; then
         exit 0
     fi
 fi
 
 exit $?
-
-
