@@ -86,5 +86,4 @@ echo
 echo -e "${colg}*${res} BOARD:  ${colg}${BOARD}${res}"
 echo -e "${colg}*${res} IMAGE:  ${colg}${IMAGE}${res}"
 echo -e "${colg}*${res} VERITY: ${colg}${VERITY}${res}"
-echo -e "${colg}* PERFORMANCE: ${PERFORMANCE}"
 echo
