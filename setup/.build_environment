@@ -1,13 +1,8 @@
 #!/bin/bash
 
 SOURCE_REPO=~/chromiumos
-REPOSYNC="-j4"
 GIT_USER=""
 GIT_EMAIL=""
-
-# Install the git revision control system, the curl download helper, and lvm tools.
-sudo apt install git-core gitk git-gui curl lvm2 thin-provisioning-tools \
-    python-pkg-resources python-virtualenv python-oauth2client xz-utils
 
 # If you have never used git before, you’ll need to set some global git configurations;
 # substitute $GIT_USER_NAME with your name, and $GIT_USER_EMAIL with your email address.
@@ -38,12 +33,6 @@ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ~/dep
 
 export PATH=${PATH}:~/depot_tools
 
-# Needs chromiumos source code.
-[ $SOURCE_REPO ] || { echo 'missing $SOURCE_REPO'; exit 1 ;}
-
-# Default repo ENVIRONMENT.
-[ $REPOFLAGS ] || REPOFLAGS="-j4"
-
 # Create a directory to hold the source, "${SOURCE_REPO}".
 # (This should not be installed on a remote NFS directory.)
 if [ ! -d $SOURCE_REPO ]; then
@@ -71,7 +60,6 @@ repo sync $REPOSYNC
 # This can be used to share editor configurations, a directory full of recovery images, etc.
 # You can create a src/scripts/.local_mounts file listing all the directories (outside of the chroot)
 # that you'd like to access inside the chroot.
-
 LOCAL_MOUNTS_FILE=${SOURCE_REPO}/src/scripts/.local_mountfs
 
 if [ ! -f ${LOCAL_MOUNTSE_FILE} ]; then
@@ -85,3 +73,4 @@ fi
 # will give off an ugly python error and fail to enter the chroot.
 # (Note: For security and safety reasons, all directories mounted via .local_mounts will be read-only.)
 echo "/home/$(whoami)/bin" > ${LOCAL_MOUNTS_FILE}
+

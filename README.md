@@ -45,7 +45,7 @@ Get the source code:
     $ ./setup/source_checkout.sh
 
 Setup google API keys, (__see docs/README-APIKEYS__).
-  
+ 
 ### Do one of the following:
 
 * option a -- Supply API keys in ~/.googleapikeys (HOST)
@@ -85,7 +85,7 @@ Inside the chroot:
 * Select your board (__see docs/README-BOARDS__)
 * Select your disk image build (__test/dev/base__)
 * Select verified boot mode (__on/off__)
-    
+
     (cr) $ export BOARD=cyan
     (cr) $ export IMAGE=test
     (cr) $ export VERITY=off
@@ -233,5 +233,5 @@ Extras:
 Making changes: (__see docs/README-MODIFYING__)
 
 Storing sources on a seperate encrypted disk: (__see docs/README-ENVIRONMENT__)
-  
+
 ### (more to come)
