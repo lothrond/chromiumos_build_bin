@@ -4,30 +4,39 @@
 
 These are a collection of environments used to successfully build Chromium OS
 
-------------------------------------------------------------------------------
- 
+-----------------------------------------------------------------------------
+
+  auto.sh
+    (For autobuild and autosync)
+
   host.sh
-    Host machine build environment.
+    Host machine environment.
 
   chroot.sh
-    Chroot environment.
+    Chroot build environment.
 
   crypt.sh
-    This environment is for the cryptmount script.
-    For more information about cryptmount, see cryptmount --help.
-    (This is probably not needed)
+    This environment is for the crypt_mount script.
+    For more information about crypt_mount, see crypt_mount --help.
+    (This may not be needed)
 
   server.sh
     This is used by the dev_server command for ota updates, etc.
-    For more information about devserver, see dev_server --help.
+    For more information about dev_server, see dev_server --help.
 
-------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 To automatically source environments:
 
  On the host machine:
    Copy: host.profile to ~/.profile
+   
+   Or run:
+     setup/host_environment.sh
 
  Inside the chroot:
    Copy chroot.bashrc to ~/.bashrc
+
+   Or run:
+     setup/chroot_environment.sh
 

@@ -20,8 +20,6 @@ colr="\e[31m"
 colg="\e[32m"
 res="\e[0m"
 
-# Prepare build operations:
-
 # Needs user (not root).
 if [ $UID -eq 0 ]; then
     echo -e "${colr}Do not run as root.${res}"; exit 1
@@ -33,6 +31,7 @@ lsblk | grep cros >& /dev/null && [ -f "/etc/cros_chroot_version" ] || \
 
 # Check chroot ENVIRONMENT:
 failed=0
+
 if ! echo ${BOARD} >& /dev/null; then
     echo -e "Needs ${colr}BOARD${res}"; failed=1
 fi
@@ -78,26 +77,28 @@ else
 fi
 
 # Optionally set cpu frequency governer to performance mode.
-if [ $PERFORMANCE -eq 0 ]; then
-    :
-elif [ $PERFORMANCE -eq 1 ]; then
-    function set_cpu_gov() {
-        echo "Setting cpu governer to ${colg}performance${res} mode..."
-        sudo cpupower set frequency-scale -g performance
-    }
-else
-    echo -e "${colr}USAGE:${res} PERFORMANCE=[0|1]"; exit 1
+if [ $PERFORMANCE ]; then
+    if [ $PERFORMANCE -eq 0 ]; then
+        :
+    elif [ $PERFORMANCE -eq 1 ]; then
+        function set_cpu_gov() {
+            echo "Setting cpu governer to ${colg}performance${res} mode..."
+            sudo cpupower set frequency-scale -g performance
+        }
+    else
+        echo -e "${colr}USAGE:${res} PERFORMANCE=[0|1]"; exit 1
+    fi
 fi
 
 # (You should be in the ~/trunk/src/scripts directory):
 if [ "$(pwd)" != "$HOME/trunk/src/scripts" ]; then
-    echo -e "You are not in ${colr}~/trunk/src/scripts${res}"
-    exit 1
+    echo -e "You are not in ${colr}~/trunk/src/scripts${res}"; exit 1
 fi
 
 # Print ENVIRONMENT:
 echo
-echo -e "${colg}*${res} BOARD:  ${BOARD}"
-echo -e "${colg}*${res} IMAGE:  ${IMAGE}"
-echo -e "${colg}*${res} VERITY: ${VERITY}"
+echo -e "${colg}*${res} BOARD:  ${colg}${BOARD}${res}"
+echo -e "${colg}*${res} IMAGE:  ${colg}${IMAGE}${res}"
+echo -e "${colg}*${res} VERITY: ${colg}${VERITY}${res}"
+echo -e "${colg}* PERFORMANCE: ${PERFORMANCE}"
 echo
