@@ -76,20 +76,6 @@ else
     echo -e "${colr}USAGE:${res} [VERITY=off] [VERITY=on]"; exit 1
 fi
 
-# Optionally set cpu frequency governer to performance mode.
-if [ $PERFORMANCE ]; then
-    if [ $PERFORMANCE -eq 0 ]; then
-        :
-    elif [ $PERFORMANCE -eq 1 ]; then
-        function set_cpu_gov() {
-            echo "Setting cpu governer to ${colg}performance${res} mode..."
-            sudo cpupower set frequency-scale -g performance
-        }
-    else
-        echo -e "${colr}USAGE:${res} PERFORMANCE=[0|1]"; exit 1
-    fi
-fi
-
 # (You should be in the ~/trunk/src/scripts directory):
 if [ "$(pwd)" != "$HOME/trunk/src/scripts" ]; then
     echo -e "You are not in ${colr}~/trunk/src/scripts${res}"; exit 1

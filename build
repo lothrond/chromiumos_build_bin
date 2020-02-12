@@ -1,4 +1,4 @@
 #!/bin/bash
 check_board && check_build || exit 1
-./build_packages --board=${BOARD}
+./build_packages --board=${BOARD} ${1}
 ./build_image --board=${BOARD} ${IMAGE}
